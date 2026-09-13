@@ -1,7 +1,9 @@
 package com.nexguardian.agent.data
 
 import com.nexguardian.agent.core.network.ApiException
+import com.nexguardian.agent.core.network.CommandEffects
 import com.nexguardian.agent.core.network.NexGuardianApi
+import com.nexguardian.agent.core.network.NoOpCommandEffects
 import com.nexguardian.agent.core.network.RemoteState
 import com.nexguardian.agent.core.network.RemoteStateStore
 import com.nexguardian.agent.domain.*
@@ -20,6 +22,7 @@ class RemoteActivationRepository(
     private val sessionStore: SessionStore,
     private val stateStore: RemoteStateStore,
     private val info: DeviceInfo,
+    private val effects: CommandEffects = NoOpCommandEffects,
     private val uuid: () -> String = { UUID.randomUUID().toString() },
     private val now: () -> Instant = { Instant.now() },
 ) : ActivationRepository {
@@ -114,6 +117,10 @@ class RemoteActivationRepository(
     // heartbeat above, so the mechanism acknowledges delivery/execution.
     private suspend fun syncCommands(token: String) {
         for (command in api.fetchCommands(token)) {
+            when (command.type) {
+                "SHOW_MESSAGE" -> effects.showMessage(command.text.orEmpty())
+                "RING_DEVICE" -> effects.ring()
+            }
             api.ackCommand(token, command.id, "EXECUTED")
         }
     }

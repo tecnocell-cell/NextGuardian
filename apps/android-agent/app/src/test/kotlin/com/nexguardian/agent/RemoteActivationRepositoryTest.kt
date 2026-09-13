@@ -1,5 +1,6 @@
 package com.nexguardian.agent
 
+import com.nexguardian.agent.core.network.CommandEffects
 import com.nexguardian.agent.core.network.HttpResult
 import com.nexguardian.agent.core.network.NexGuardianApi
 import com.nexguardian.agent.data.RemoteActivationRepository
@@ -82,5 +83,34 @@ class RemoteActivationRepositoryTest {
         repository.simulateHeartbeat()
         assertEquals(1, acked.size)
         assertTrue(acked[0].contains("cmd-1"))
+    }
+
+    @Test fun heartbeatRunsCommandEffectsBeforeAck() = runTest {
+        val messages = mutableListOf<String>()
+        var rings = 0
+        val acked = mutableListOf<String>()
+        val effects = object : CommandEffects {
+            override fun showMessage(text: String) { messages.add(text) }
+            override fun ring() { rings++ }
+        }
+        val session = InMemorySessionStore()
+        val state = InMemoryRemoteStateStore()
+        val api = NexGuardianApi(FakeHttpClient { _, path, _, _ ->
+            when {
+                path == "/agent/commands" -> HttpResult(200, """{"commands":[{"id":"c1","type":"SHOW_MESSAGE","payload":{"text":"Oi"}},{"id":"c2","type":"RING_DEVICE"}],"serverTime":"t"}""")
+                path.startsWith("/agent/commands/") && path.endsWith("/ack") -> {
+                    acked.add(path)
+                    HttpResult(200, """{"id":"c","deviceId":"d","type":"RING_DEVICE","status":"EXECUTED"}""")
+                }
+                else -> route(path)
+            }
+        }) { "idem" }
+        val repository = RemoteActivationRepository(api, session, state, info, effects, uuid = { "dev-uuid" }, now = { Instant.parse("2026-01-01T00:00:00Z") })
+        repository.validate("NG-1")
+        repository.confirm()
+        repository.simulateHeartbeat()
+        assertEquals(listOf("Oi"), messages)
+        assertEquals(1, rings)
+        assertEquals(2, acked.size)
     }
 }

@@ -12,9 +12,12 @@ android {
         versionCode = 1
         versionName = "0.1.0-demo"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        // Real API is opt-in; the default demo build keeps the offline mock.
-        buildConfigField("boolean", "USE_REAL_API", "false")
-        buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:3000\"")
+        // Real API is opt-in via Gradle properties; the default demo build keeps the offline mock.
+        // Example: ./gradlew assembleRelease -PuseRealApi=true -PapiBaseUrl=https://api.example.com
+        val useRealApi = (project.findProperty("useRealApi") ?: "false").toString()
+        val apiBaseUrl = (project.findProperty("apiBaseUrl") ?: "http://10.0.2.2:3000").toString()
+        buildConfigField("boolean", "USE_REAL_API", useRealApi)
+        buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
     }
     buildFeatures { compose = true; buildConfig = true }
     compileOptions {

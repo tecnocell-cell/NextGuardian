@@ -16,7 +16,8 @@ class NexGuardianApplication : Application() {
         val session = PreferencesSessionStore(agentPreferences)
         if (BuildConfig.USE_REAL_API) {
             val api = NexGuardianApi(JdkHttpClient(BuildConfig.API_BASE_URL))
-            RemoteActivationRepository(api, session, DataStoreRemoteStateStore(agentRemotePreferences), deviceInfo)
+            val stateStore = DataStoreRemoteStateStore(agentRemotePreferences, KeystoreCipher())
+            RemoteActivationRepository(api, session, stateStore, deviceInfo, AndroidCommandEffects(this))
         } else {
             MockActivationRepository(session, deviceInfo)
         }

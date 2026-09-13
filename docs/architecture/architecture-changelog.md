@@ -20,6 +20,19 @@ Build/typecheck/lint PASS; 11 testes em 2 suites PASS; processo compilado retorn
 Corrigidas referências documentais WP-001→WP-101; ajustada compatibilidade ESM/Nest e ferramentas. [Relatório completo e aceite](wp-101-bootstrap-report.md). WP-102 NÃO INICIADO. Trabalho parado.
 
 
+## Rodada 15 — Fechamento dos itens parciais/interinos (2026-09-13)
+
+Fechamento dos pontos "parcial/interino":
+- **Pesos de risco configuráveis por tenant** (backend): `Policy` ganhou colunas `riskWeight*`; `evaluateRisk` as usa; `GET/PUT /policy` expõem/atualizam. Migração `20260913000400_policy_weights`. 25 unit + 35 integração.
+- **Efeitos de comando no agente**: `CommandEffects` (porta) + `AndroidCommandEffects` (notificação p/ `SHOW_MESSAGE`, toque p/ `RING_DEVICE`); despacho no `syncCommands` antes do ack; payload `text` parseado. Permissão `POST_NOTIFICATIONS`.
+- **Hardening de tokens (Keystore)**: `SecretCipher` + `KeystoreCipher` (AES/GCM no Android Keystore); `RemoteStateCrypto` cifra só os 4 campos sensíveis; `DataStoreRemoteStateStore` grava cifrado. Lógica testada na JVM com cifra fake.
+- **Build real ergonômico**: `USE_REAL_API`/`API_BASE_URL` via propriedades Gradle (`-PuseRealApi=true -PapiBaseUrl=...`); mock continua default. Documentado no README do agente.
+- **Pagamento**: permanece **decisão de produto** (provedor + chaves externas) — não é lacuna de código.
+
+**Verificado:** backend (25 unit + 35 integração + contrato + lint + build); agente (26 unit JVM — novos: efeitos de comando e round-trip de cifra; `assembleDebug` + `lintDebug`).
+
+**Limite honesto:** os efeitos Android reais (notificação/toque) e a crypto do Keystore compilam e passam no lint, mas **não foram testados em runtime** aqui (exigem emulador/aparelho); a lógica de despacho e o contrato da cifra são cobertos por testes JVM com fakes.
+
 ## Rodada 14 — Fase 6: Políticas, Compliance e Device Risk Score (2026-09-13)
 
 **Backend (`services/api`):** avaliação de conformidade e **risco explicável** (server-side, fase 6 do roadmap).

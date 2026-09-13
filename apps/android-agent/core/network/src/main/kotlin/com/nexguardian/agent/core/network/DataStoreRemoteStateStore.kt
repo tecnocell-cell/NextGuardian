@@ -13,7 +13,11 @@ import kotlinx.coroutines.flow.map
 
 val Context.agentRemotePreferences by preferencesDataStore(name = "nexguardian_remote")
 
-class DataStoreRemoteStateStore(private val store: DataStore<Preferences>) : RemoteStateStore {
+/** Token/ticket fields are stored encrypted via [cipher] (Keystore-backed in production). */
+class DataStoreRemoteStateStore(
+    private val store: DataStore<Preferences>,
+    private val cipher: SecretCipher = PlaintextCipher,
+) : RemoteStateStore {
     private object Keys {
         val activationTicket = stringPreferencesKey("activationTicket")
         val pairingId = stringPreferencesKey("pairingId")
@@ -27,7 +31,8 @@ class DataStoreRemoteStateStore(private val store: DataStore<Preferences>) : Rem
         val connection = stringPreferencesKey("connection")
     }
 
-    private fun decode(p: Preferences) = RemoteState(
+    // Reads the stored (encrypted-at-rest) representation verbatim.
+    private fun decodeStored(p: Preferences) = RemoteState(
         activationTicket = p[Keys.activationTicket],
         pairingId = p[Keys.pairingId],
         pairingTicket = p[Keys.pairingTicket],
@@ -40,21 +45,25 @@ class DataStoreRemoteStateStore(private val store: DataStore<Preferences>) : Rem
         connection = p[Keys.connection] ?: "UNKNOWN",
     )
 
-    override val state: Flow<RemoteState> = store.data.map(::decode)
+    private fun writeStored(p: MutablePreferences, state: RemoteState) {
+        putOrRemove(p, Keys.activationTicket, state.activationTicket)
+        putOrRemove(p, Keys.pairingId, state.pairingId)
+        putOrRemove(p, Keys.pairingTicket, state.pairingTicket)
+        putOrRemove(p, Keys.accessToken, state.accessToken)
+        putOrRemove(p, Keys.refreshToken, state.refreshToken)
+        putOrRemove(p, Keys.accountName, state.accountName)
+        putOrRemove(p, Keys.subscriptionState, state.subscriptionState)
+        state.trialStartedAt?.let { p[Keys.trialStartedAt] = it } ?: p.remove(Keys.trialStartedAt)
+        state.trialExpiresAt?.let { p[Keys.trialExpiresAt] = it } ?: p.remove(Keys.trialExpiresAt)
+        p[Keys.connection] = state.connection
+    }
+
+    override val state: Flow<RemoteState> = store.data.map { RemoteStateCrypto.reveal(decodeStored(it), cipher) }
 
     override suspend fun update(transform: (RemoteState) -> RemoteState) {
         store.edit { p ->
-            val next = transform(decode(p))
-            putOrRemove(p, Keys.activationTicket, next.activationTicket)
-            putOrRemove(p, Keys.pairingId, next.pairingId)
-            putOrRemove(p, Keys.pairingTicket, next.pairingTicket)
-            putOrRemove(p, Keys.accessToken, next.accessToken)
-            putOrRemove(p, Keys.refreshToken, next.refreshToken)
-            putOrRemove(p, Keys.accountName, next.accountName)
-            putOrRemove(p, Keys.subscriptionState, next.subscriptionState)
-            next.trialStartedAt?.let { p[Keys.trialStartedAt] = it } ?: p.remove(Keys.trialStartedAt)
-            next.trialExpiresAt?.let { p[Keys.trialExpiresAt] = it } ?: p.remove(Keys.trialExpiresAt)
-            p[Keys.connection] = next.connection
+            val current = RemoteStateCrypto.reveal(decodeStored(p), cipher)
+            writeStored(p, RemoteStateCrypto.protect(transform(current), cipher))
         }
     }
 

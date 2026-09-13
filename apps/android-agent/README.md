@@ -43,6 +43,16 @@ Os agrupamentos core/network, core/realtime, feature/permissions e service/messa
 
 AGP 9.2.1; Gradle 9.4.1 (wrapper com SHA-256); Kotlin/Compose Compiler 2.3.10; Compose BOM 2026.08.00; Activity 1.13.0; Lifecycle 2.11.0; Navigation Compose 2.10.1; Coroutines 1.10.2; DataStore 1.2.1; WorkManager 2.11.2. minSdk 26; compileSdk/targetSdk 37; applicationId com.nexguardian.agent.
 
+## Build contra a API real (opt-in)
+
+O build padrão usa o mock offline. Para um build que fala com o backend real:
+
+~~~powershell
+.\gradlew.bat assembleRelease -PuseRealApi=true -PapiBaseUrl=https://api.seu-dominio
+~~~
+
+No emulador contra o backend local use `-PapiBaseUrl=http://10.0.2.2:3000`. Nesse caminho os tokens são cifrados no Keystore (`KeystoreCipher`), o agente busca/confirma comandos no heartbeat e executa efeitos legítimos (notificação para `SHOW_MESSAGE`, toque para `RING_DEVICE`).
+
 ## Documentação
 
 - [Contratos OpenAPI](../../packages/contracts/README.md)

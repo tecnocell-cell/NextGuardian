@@ -5,7 +5,7 @@ import java.util.UUID
 
 class ApiException(val status: Int, message: String) : Exception(message)
 
-data class AgentCommand(val id: String, val type: String)
+data class AgentCommand(val id: String, val type: String, val text: String? = null)
 data class ValidateResult(val activationTicket: String, val accountDisplayName: String, val expiresAt: String)
 data class PairResult(val pairingId: String, val pairingTicket: String)
 data class ConfirmResult(
@@ -95,7 +95,7 @@ class NexGuardianApi(
         val body = success(http.getJson("/agent/commands", accessToken))
         val commands = body.fields["commands"] as? JsonArray ?: return emptyList()
         return commands.items.mapNotNull { item ->
-            (item as? JsonObject)?.let { AgentCommand(it.str("id").orEmpty(), it.str("type").orEmpty()) }
+            (item as? JsonObject)?.let { AgentCommand(it.str("id").orEmpty(), it.str("type").orEmpty(), it.obj("payload")?.str("text")) }
         }
     }
 
