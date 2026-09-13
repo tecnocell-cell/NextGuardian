@@ -1,0 +1,2338 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "NexGuardian Foundation API",
+    "version": "0.1.0",
+    "description": "Contrato proposto, sem backend. Nenhum endpoint do produto original é utilizado."
+  },
+  "servers": [
+    {
+      "url": "https://api.nexguardian.invalid/v1",
+      "description": "Placeholder não operacional; substituir por infraestrutura própria."
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Activation"
+    },
+    {
+      "name": "Devices"
+    },
+    {
+      "name": "Subscription"
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "operationId": "register",
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Cadastrar conta e usuário",
+        "description": "Cadastrar conta e usuário",
+        "security": [],
+        "responses": {
+          "201": {
+            "description": "Sucesso",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Pedido inválido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credencial inválida ou expirada",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso não autorizado",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou repetição divergente",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de tentativas excedido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno sem detalhes sensíveis",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Escopo por principal/operação. Mesmo corpo retorna mesmo resultado; corpo diferente retorna 409."
+          }
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "login",
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Autenticar usuário",
+        "description": "Erro genérico para usuário/senha inválidos; credenciais transmitidas somente via HTTPS, com rate limit.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Pedido inválido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credencial inválida ou expirada",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso não autorizado",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou repetição divergente",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de tentativas excedido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno sem detalhes sensíveis",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/activation/validate": {
+      "post": {
+        "operationId": "validateActivation",
+        "tags": [
+          "Activation"
+        ],
+        "summary": "Validar código sem conceder trial",
+        "description": "Rate limit por origem/código/deviceId. Apenas cria ticket temporário; não consome trial nem fornece sessão permanente.",
+        "security": [],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Escopo por operação e installation (deviceId/código, pois não há principal autenticado). Mesmo corpo retorna mesmo resultado; corpo diferente retorna 409."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateActivationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Pedido inválido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credencial inválida ou expirada",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso não autorizado",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou repetição divergente",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de tentativas excedido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno sem detalhes sensíveis",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateActivationRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/devices/pair": {
+      "post": {
+        "operationId": "requestPairing",
+        "tags": [
+          "Devices"
+        ],
+        "summary": "Solicitar vínculo",
+        "description": "Solicitar vínculo",
+        "security": [
+          {
+            "activationTicket": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Sucesso",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PairResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Pedido inválido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credencial inválida ou expirada",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso não autorizado",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou repetição divergente",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de tentativas excedido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno sem detalhes sensíveis",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PairRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Escopo por principal/operação. Mesmo corpo retorna mesmo resultado; corpo diferente retorna 409."
+          }
+        ]
+      }
+    },
+    "/devices/pair/confirm": {
+      "post": {
+        "operationId": "confirmPairing",
+        "tags": [
+          "Devices"
+        ],
+        "summary": "Confirmar vínculo e obter estado de assinatura",
+        "description": "Confirmar vínculo e obter estado de assinatura",
+        "security": [
+          {
+            "pairingTicket": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfirmPairResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Pedido inválido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credencial inválida ou expirada",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso não autorizado",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou repetição divergente",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de tentativas excedido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno sem detalhes sensíveis",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmPairRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Escopo por principal/operação. Mesmo corpo retorna mesmo resultado; corpo diferente retorna 409."
+          }
+        ]
+      }
+    },
+    "/devices/session/refresh": {
+      "post": {
+        "operationId": "refreshDeviceSession",
+        "tags": [
+          "Devices"
+        ],
+        "summary": "Rotacionar sessão de dispositivo",
+        "description": "Refresh token autentica a operação. Rotação atômica, dispositivo vinculado e família de sessões; replay invalida a família. Nunca aceitar UUID sozinho.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceSession"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Pedido inválido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credencial inválida ou expirada",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso não autorizado",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou repetição divergente",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de tentativas excedido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno sem detalhes sensíveis",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/devices/heartbeat": {
+      "post": {
+        "operationId": "heartbeat",
+        "tags": [
+          "Devices"
+        ],
+        "summary": "Enviar status operacional mínimo",
+        "description": "Enviar status operacional mínimo",
+        "security": [
+          {
+            "deviceBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HeartbeatResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Pedido inválido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credencial inválida ou expirada",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso não autorizado",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou repetição divergente",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de tentativas excedido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno sem detalhes sensíveis",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HeartbeatRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Escopo por principal/operação. Mesmo corpo retorna mesmo resultado; corpo diferente retorna 409."
+          }
+        ]
+      }
+    },
+    "/devices/revoke": {
+      "post": {
+        "operationId": "revokeDevice",
+        "tags": [
+          "Devices"
+        ],
+        "summary": "Revogar vínculo",
+        "description": "Dispositivo só revoga a si; conta só revoga seus dispositivos. Token revogado não autoriza novas operações. Repetição por conta com mesma chave mantém resultado.",
+        "security": [
+          {
+            "deviceBearer": []
+          },
+          {
+            "accountBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevokeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Pedido inválido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credencial inválida ou expirada",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso não autorizado",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou repetição divergente",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de tentativas excedido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno sem detalhes sensíveis",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevokeRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Escopo por principal/operação. Mesmo corpo retorna mesmo resultado; corpo diferente retorna 409."
+          }
+        ]
+      }
+    },
+    "/devices/me": {
+      "get": {
+        "operationId": "getDevice",
+        "tags": [
+          "Devices"
+        ],
+        "summary": "Consultar o próprio aparelho",
+        "description": "Consultar o próprio aparelho",
+        "security": [
+          {
+            "deviceBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceMeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Pedido inválido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credencial inválida ou expirada",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso não autorizado",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou repetição divergente",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de tentativas excedido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno sem detalhes sensíveis",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscription/me": {
+      "get": {
+        "operationId": "getSubscription",
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Consultar assinatura autorizada",
+        "description": "Consultar assinatura autorizada",
+        "security": [
+          {
+            "deviceBearer": []
+          },
+          {
+            "accountBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionMeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Pedido inválido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credencial inválida ou expirada",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso não autorizado",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou repetição divergente",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de tentativas excedido",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno sem detalhes sensíveis",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "INVALID_REQUEST",
+              "INVALID_CREDENTIALS",
+              "ACTIVATION_INVALID",
+              "ACTIVATION_EXPIRED",
+              "ACTIVATION_CONSUMED",
+              "PAIRING_EXPIRED",
+              "PAIRING_STATE_CONFLICT",
+              "SESSION_REVOKED",
+              "REFRESH_REUSED",
+              "IDEMPOTENCY_CONFLICT",
+              "FORBIDDEN",
+              "NOT_FOUND",
+              "RATE_LIMITED",
+              "SERVER_ERROR"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "requestId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "requestId"
+        ]
+      },
+      "Account": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "User": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          }
+        },
+        "required": [
+          "id",
+          "accountId",
+          "name",
+          "email"
+        ]
+      },
+      "DevicePairingState": {
+        "type": "string",
+        "enum": [
+          "UNPAIRED",
+          "PAIRING_PENDING",
+          "PAIRED",
+          "REVOKED"
+        ]
+      },
+      "SubscriptionState": {
+        "type": "string",
+        "enum": [
+          "TRIAL",
+          "ACTIVE",
+          "EXPIRED",
+          "CANCELLED"
+        ]
+      },
+      "ConnectionState": {
+        "type": "string",
+        "enum": [
+          "ONLINE",
+          "OFFLINE",
+          "UNKNOWN"
+        ]
+      },
+      "DeviceInfo": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "appVersion": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "androidVersion": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "manufacturer": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "model": {
+            "type": "string",
+            "maxLength": 120
+          }
+        },
+        "required": [
+          "name",
+          "appVersion",
+          "androidVersion",
+          "manufacturer",
+          "model"
+        ]
+      },
+      "Device": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "pairingState": {
+            "$ref": "#/components/schemas/DevicePairingState"
+          }
+        },
+        "required": [
+          "id",
+          "accountId",
+          "name",
+          "pairingState"
+        ]
+      },
+      "Subscription": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "$ref": "#/components/schemas/SubscriptionState"
+          },
+          "trialStartedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC3339 UTC; datas de negócio são definidas pelo servidor."
+          },
+          "trialExpiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC3339 UTC; datas de negócio são definidas pelo servidor."
+          }
+        },
+        "required": [
+          "accountId",
+          "state",
+          "trialStartedAt",
+          "trialExpiresAt"
+        ],
+        "description": "Primeiro pareamento confirmado inicia trial de 48h uma única vez por conta. Datas imutáveis; novos códigos/dispositivos não reiniciam."
+      },
+      "AccountSession": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "minLength": 32
+          },
+          "refreshToken": {
+            "type": "string",
+            "minLength": 32
+          },
+          "accessExpiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC3339 UTC; datas de negócio são definidas pelo servidor."
+          }
+        },
+        "required": [
+          "accessToken",
+          "refreshToken",
+          "accessExpiresAt"
+        ],
+        "description": "Credenciais exclusivas da conta. Respostas nunca cacheadas; não persistir em texto puro no aparelho."
+      },
+      "DeviceSession": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deviceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accessToken": {
+            "type": "string",
+            "minLength": 32
+          },
+          "refreshToken": {
+            "type": "string",
+            "minLength": 32
+          },
+          "accessExpiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC3339 UTC; datas de negócio são definidas pelo servidor."
+          }
+        },
+        "required": [
+          "sessionId",
+          "deviceId",
+          "accessToken",
+          "refreshToken",
+          "accessExpiresAt"
+        ],
+        "description": "Tokens com audiência de dispositivo e escopo mínimo, separados dos tokens de conta e de FCM."
+      },
+      "IssuedActivationCode": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "value": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 64
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC3339 UTC; datas de negócio são definidas pelo servidor."
+          }
+        },
+        "required": [
+          "value",
+          "expiresAt"
+        ],
+        "description": "Código emitido pelo servidor para a conta autenticada, expira e só pode ser consumido uma vez. Não é credencial permanente."
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "password": {
+            "type": "string",
+            "minLength": 12,
+            "maxLength": 128,
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "password"
+        ]
+      },
+      "LoginRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "AuthResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/Account"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "session": {
+            "$ref": "#/components/schemas/AccountSession"
+          },
+          "activationCode": {
+            "$ref": "#/components/schemas/IssuedActivationCode"
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC3339 UTC; datas de negócio são definidas pelo servidor."
+          }
+        },
+        "required": [
+          "account",
+          "user",
+          "session",
+          "activationCode",
+          "serverTime"
+        ],
+        "description": "Registro/login podem emitir novo código de vínculo; emitir código não concede novo trial. Verificação de e-mail e política antifraude devem ser definidas antes da produção."
+      },
+      "ValidateActivationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "writeOnly": true
+          },
+          "deviceId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "code",
+          "deviceId"
+        ]
+      },
+      "ValidateActivationResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "activationTicket": {
+            "type": "string",
+            "minLength": 32
+          },
+          "accountDisplayName": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC3339 UTC; datas de negócio são definidas pelo servidor."
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC3339 UTC; datas de negócio são definidas pelo servidor."
+          }
+        },
+        "required": [
+          "activationTicket",
+          "accountDisplayName",
+          "expiresAt",
+          "serverTime"
+        ],
+        "description": "Ticket restrito à ativação, ligado a código/conta/deviceId, sem listar dados privados da conta."
+      },
+      "PairRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "deviceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deviceInfo": {
+            "$ref": "#/components/schemas/DeviceInfo"
+          }
+        },
+        "required": [
+          "deviceId",
+          "deviceInfo"
+        ]
+      },
+      "PairResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "pairingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "device": {
+            "$ref": "#/components/schemas/Device"
+          },
+          "pairingTicket": {
+            "type": "string",
+            "minLength": 32
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC3339 UTC; datas de negócio são definidas pelo servidor."
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC3339 UTC; datas de negócio são definidas pelo servidor."
+          }
+        },
+        "required": [
+          "pairingId",
+          "device",
+          "pairingTicket",
+          "expiresAt",
+          "serverTime"
+        ],
+        "description": "Estado PAIRING_PENDING. Ticket só confirma este pairingId/deviceId; não autoriza APIs de dispositivo."
+      },
+      "ConfirmPairRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "pairingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deviceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "confirmedOnDevice": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": [
+          "pairingId",
+          "deviceId",
+          "confirmedOnDevice"
+        ]
+      },
+      "ConfirmPairResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "device": {
+            "$ref": "#/components/schemas/Device"
+          },
+          "session": {
+            "$ref": "#/components/schemas/DeviceSession"
+          },
+          "subscription": {
+            "$ref": "#/components/schemas/Subscription"
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC3339 UTC; datas de negócio são definidas pelo servidor."
+          }
+        },
+        "required": [
+          "device",
+          "session",
+          "subscription",
+          "serverTime"
+        ],
+        "description": "Confirmação atômica: consome código/ticket, marca PAIRED, cria sessão e inicia trial somente se a conta nunca teve trial. confirmedOnDevice documenta a confirmação de UI, não é prova criptográfica."
+      },
+      "RefreshRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "deviceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "refreshToken": {
+            "type": "string",
+            "minLength": 32,
+            "writeOnly": true,
+            "description": "Segredo de curta duração; nunca registrar em logs."
+          }
+        },
+        "required": [
+          "deviceId",
+          "refreshToken"
+        ]
+      },
+      "HeartbeatRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "deviceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "appVersion": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "androidVersion": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "manufacturer": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "model": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "batteryLevel": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "networkType": {
+            "type": "string",
+            "enum": [
+              "WIFI",
+              "CELLULAR",
+              "ETHERNET",
+              "NONE",
+              "UNKNOWN"
+            ]
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC3339 UTC; datas de negócio são definidas pelo servidor."
+          }
+        },
+        "required": [
+          "deviceId",
+          "appVersion",
+          "androidVersion",
+          "manufacturer",
+          "model",
+          "batteryLevel",
+          "networkType",
+          "timestamp"
+        ],
+        "description": "Telemetria mínima, sem dados privados. timestamp do cliente é não confiável e não concede direitos. UUID não é IMEI/serial."
+      },
+      "HeartbeatResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "serverReceivedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC3339 UTC; datas de negócio são definidas pelo servidor."
+          },
+          "connectionState": {
+            "$ref": "#/components/schemas/ConnectionState"
+          },
+          "subscription": {
+            "$ref": "#/components/schemas/Subscription"
+          }
+        },
+        "required": [
+          "serverReceivedAt",
+          "connectionState",
+          "subscription"
+        ],
+        "description": "Expiração não modifica pairingState. Reconhecimento operacional pode retornar assinatura EXPIRED; não concede recursos pagos."
+      },
+      "RevokeRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "deviceId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "deviceId"
+        ]
+      },
+      "RevokeResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "device": {
+            "$ref": "#/components/schemas/Device"
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC3339 UTC; datas de negócio são definidas pelo servidor."
+          }
+        },
+        "required": [
+          "device",
+          "serverTime"
+        ],
+        "description": "Revogação invalida todas as sessões e tickets pendentes do dispositivo e é idempotente; não reinicia trial."
+      },
+      "DeviceMeResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "device": {
+            "$ref": "#/components/schemas/Device"
+          },
+          "deviceInfo": {
+            "$ref": "#/components/schemas/DeviceInfo"
+          },
+          "connectionState": {
+            "$ref": "#/components/schemas/ConnectionState"
+          },
+          "lastSync": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC3339 UTC; datas de negócio são definidas pelo servidor."
+          }
+        },
+        "required": [
+          "device",
+          "deviceInfo",
+          "connectionState",
+          "lastSync",
+          "serverTime"
+        ]
+      },
+      "SubscriptionMeResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "subscription": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Subscription"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC3339 UTC; datas de negócio são definidas pelo servidor."
+          }
+        },
+        "required": [
+          "subscription",
+          "serverTime"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "accountBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Access token de conta. O escopo de isolamento (accountId, que mapeia o Workspace do domínio — ver ADR-0003) é transportado como claim no token; nenhum endpoint aceita identificador de conta/workspace por query ou path."
+      },
+      "deviceBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Access token de sessão de dispositivo, com audiência de dispositivo, vinculado a deviceId e ao escopo de conta/workspace (accountId) transportado como claim no token; nenhum endpoint aceita esse identificador por query ou path."
+      },
+      "activationTicket": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Ticket temporário exclusivo de validate → pair, ligado à conta e ao UUID da instalação."
+      },
+      "pairingTicket": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Ticket temporário exclusivo para confirmar um pareamento pendente."
+      }
+    }
+  }
+}

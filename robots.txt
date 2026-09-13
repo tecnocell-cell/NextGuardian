@@ -1,0 +1,6 @@
+# NextGuardian — https://github.com/tecnocell-cell/NextGuardian
+# Allow search engines to index the public site.
+User-agent: *
+Allow: /
+
+Sitemap: https://tecnocell-cell.github.io/NextGuardian/sitemap.xml

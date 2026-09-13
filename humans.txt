@@ -1,0 +1,14 @@
+/* TEAM */
+Criador: Gianderson Fábio J.
+Contato: giandersonfjs@gmail.com
+Telefone: +55 94 98140-6316
+Site: https://github.com/tecnocell-cell/NextGuardian
+
+/* PROJECT */
+Nome: NextGuardian
+Descrição: Plataforma SaaS multi-tenant de gestão e monitoramento consentido de dispositivos Android (controle parental + MDM).
+Idioma: Português (pt-BR)
+Padrões: consentimento, transparência, LGPD, Play-compatível.
+
+/* TECH */
+Kotlin, Jetpack Compose, Node.js, TypeScript, NestJS, Prisma, PostgreSQL, OpenAPI 3.1.

@@ -1,0 +1,14 @@
+{
+  "navigation": [
+    "Welcome",
+    "Activation",
+    "Pairing",
+    "Status",
+    "Settings"
+  ],
+  "persistence_after_force_stop": true,
+  "uuid": "c2f6ec25-e6fd-46a3-9700-ab1473f32a54",
+  "preferences_sha256_before": "1dddff78985ee4d3f350d82d5deee706d0e63efff6adfe3bdb130b0b984f2f60",
+  "preferences_sha256_after": "1dddff78985ee4d3f350d82d5deee706d0e63efff6adfe3bdb130b0b984f2f60",
+  "sensitive_permissions_requested": false
+}

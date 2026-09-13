@@ -1,0 +1,9 @@
+.gradle/
+.kotlin/
+.bootstrap/
+**/build/
+local.properties
+*.jks
+*.keystore
+
+*.log
