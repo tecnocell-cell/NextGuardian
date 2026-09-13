@@ -20,6 +20,16 @@ Build/typecheck/lint PASS; 11 testes em 2 suites PASS; processo compilado retorn
 Corrigidas referências documentais WP-001→WP-101; ajustada compatibilidade ESM/Nest e ferramentas. [Relatório completo e aceite](wp-101-bootstrap-report.md). WP-102 NÃO INICIADO. Trabalho parado.
 
 
+## Rodada 11 — WP-201: console web + API de conta (2026-09-13)
+
+**Backend (`services/api`):** novos endpoints escopados por conta para o console — `GET /account/me` (workspace/usuário/contagem de dispositivos), `GET /devices` (lista do workspace), `POST /activation/codes` (emitir código). Contrato OpenAPI atualizado (13 paths; validador ajustado). CORS habilitado (Bearer, sem cookies). Guard de conta reutilizado; isolamento por workspace mantido. **26 testes de integração** (12 workspace + 10 enrollment + **4 console**), 19 unit, typecheck/lint/contrato verdes.
+
+**Web (`apps/web-admin`):** console operacional em **Next.js (App Router) + TypeScript + Tailwind**, na **porta 3001** (backend na 3000 — apenas duas portas). Telas: login/registro, visão geral (contadores + assinatura), dispositivos (lista + detalhe com revogação), vínculo (emitir código de ativação), assinatura, configurações. Cliente de API com Bearer; presença derivada de `lastSync`. **`npm install` + `npm run build` verdes** (9 rotas, tipos válidos).
+
+**Segurança:** `postcss` direto atualizado para versão corrigida; resta advisory de build no `postcss` empacotado pelo Next (dev-only, baixo risco; sai com upgrade major do Next). Nenhum segredo commitado.
+
+**Cobre:** WP-201 + API de conta. Estrutura web pronta.
+
 ## Rodada 10 — WP-301: agente Android ↔ API real (2026-09-13)
 
 **Implementado (atrás da flag `USE_REAL_API`, default false → mock preservado):**

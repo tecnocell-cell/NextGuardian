@@ -26,4 +26,4 @@ Data: 2026-09-11. Documento de desenho. É o **console enxuto** para desenvolver
 - Reaproveitar a stack do painel completo (Next.js/React/TS) em versão mínima, ou até um app server-rendered simples — decisão de baixo custo, sem travar.
 
 ## 4. Estado atual
-`PLANEJADO`. Especificado como **Fase 1B** no [roadmap](implementation-roadmap.md), logo após a 1A.
+**IMPLEMENTADO** (rodada 11): `apps/web-admin` (Next.js + TypeScript + Tailwind), porta 3001, consumindo a API de conta (`account/me`, `GET /devices`, `subscription/me`, `activation/codes`, `devices/revoke`). Telas: login/registro, visão geral, dispositivos (lista + detalhe/revogação), vínculo (emitir código), assinatura, configurações. Backend e web em **duas portas** (3000 e 3001). `npm run build` verde. Próximo: prova e2e ao vivo e evolução para o painel completo ([doc 17](17-painel-web.md)).
