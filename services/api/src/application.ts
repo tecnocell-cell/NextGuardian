@@ -8,6 +8,8 @@ import type { Logger } from 'pino';
 export async function createApplication(logger: Logger, config: Environment = parseEnvironment(process.env)) {
   const app = await NestFactory.create(AppModule.register(config.DATABASE_URL), { logger: false, abortOnError: false });
   app.use(requestLogging(logger));
+  // Bearer-token API (no cookies). CORS_ORIGIN restricts origins in production; dev reflects the request origin.
+  app.enableCors({ origin: config.CORS_ORIGIN ?? true, credentials: false });
   app.getHttpAdapter().getInstance().disable('x-powered-by');
   app.enableShutdownHooks();
   return app;

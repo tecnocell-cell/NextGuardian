@@ -3,11 +3,18 @@ import { DevicesService } from './devices.service.js';
 import { confirmPairSchema, heartbeatSchema, pairSchema, refreshSchema, revokeSchema } from './devices.dto.js';
 import { parseBody } from '../../shared/http/validation.js';
 import { bearer, CurrentPrincipal, type Principal } from '../../shared/auth/principal.js';
-import { AccountOrDeviceGuard, DeviceGuard } from '../../shared/auth/guards.js';
+import { AccountGuard, AccountOrDeviceGuard, DeviceGuard } from '../../shared/auth/guards.js';
 
 @Controller('devices')
 export class DevicesController {
   constructor(private readonly devices: DevicesService) {}
+
+  @Get()
+  @UseGuards(AccountGuard)
+  @Header('Cache-Control', 'no-store')
+  list(@CurrentPrincipal() principal: Principal) {
+    return this.devices.list(principal);
+  }
 
   @Post('pair')
   @HttpCode(201)

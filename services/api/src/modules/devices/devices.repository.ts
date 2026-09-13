@@ -37,6 +37,10 @@ export class DevicesRepository {
     return this.db.device.findUnique({ where: { deviceId } });
   }
 
+  listByWorkspace(workspaceId: string) {
+    return this.db.device.findMany({ where: { workspaceId }, orderBy: { createdAt: 'asc' } });
+  }
+
   getSubscription(workspaceId: string) {
     return this.db.subscription.findUnique({ where: { workspaceId } });
   }

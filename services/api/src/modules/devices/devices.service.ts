@@ -12,7 +12,7 @@ import { generateToken, hashToken } from '../../shared/crypto/secrets.js';
 import { issueTokens } from '../../shared/auth/tokens.js';
 import { DEVICE_ACCESS_TTL, DEVICE_REFRESH_TTL, MINUTE, PAIRING_TICKET_TTL } from '../../shared/time/durations.js';
 import { serverTime } from '../../shared/http/validation.js';
-import { deviceInfoView, deviceSessionView, deviceView, subscriptionView } from '../../shared/http/serializers.js';
+import { deviceInfoView, deviceSessionView, deviceSummaryView, deviceView, subscriptionView } from '../../shared/http/serializers.js';
 import type { Principal } from '../../shared/auth/principal.js';
 
 const ONLINE_WINDOW = 10 * MINUTE;
@@ -119,6 +119,12 @@ export class DevicesService {
     const device = await this.repo.revoke(principal.workspaceId, input.deviceId);
     if (!device) throw new NotFoundException('Device not found in workspace');
     return { device: deviceView(device), serverTime: serverTime() };
+  }
+
+  // Account-scoped: lists devices in the caller's workspace (for the web console).
+  async list(principal: Principal) {
+    const devices = await this.repo.listByWorkspace(principal.workspaceId);
+    return { devices: devices.map(deviceSummaryView), serverTime: serverTime() };
   }
 
   async me(principal: Principal) {

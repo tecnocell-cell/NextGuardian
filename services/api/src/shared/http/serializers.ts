@@ -23,6 +23,26 @@ export function deviceView(device: DeviceRecord) {
   return { id: device.deviceId, accountId: device.workspaceId, name: device.name, pairingState: device.pairingState };
 }
 
+export interface DeviceSummaryRecord extends DeviceRecord {
+  batteryLevel: number | null;
+  networkType: string | null;
+}
+
+export function deviceSummaryView(device: DeviceSummaryRecord) {
+  return {
+    id: device.deviceId,
+    name: device.name,
+    pairingState: device.pairingState,
+    manufacturer: device.manufacturer,
+    model: device.model,
+    androidVersion: device.androidVersion,
+    appVersion: device.appVersion,
+    lastSync: device.lastSyncAt ? device.lastSyncAt.toISOString() : null,
+    batteryLevel: device.batteryLevel,
+    networkType: device.networkType,
+  };
+}
+
 export function deviceInfoView(device: DeviceRecord) {
   return {
     name: device.name,
