@@ -7,6 +7,8 @@ import { AccountModule } from './modules/account/account.module.js';
 import { ActivationModule } from './modules/activation/activation.module.js';
 import { DevicesModule } from './modules/devices/devices.module.js';
 import { SubscriptionModule } from './modules/subscription/subscription.module.js';
+import { EventsModule } from './modules/events/events.module.js';
+import { CommandsModule } from './modules/commands/commands.module.js';
 @Module({})
 export class AppModule {
   static register(databaseUrl?: string): DynamicModule {
@@ -21,6 +23,8 @@ export class AppModule {
         ActivationModule,
         DevicesModule,
         SubscriptionModule,
+        EventsModule,
+        CommandsModule,
       ],
     };
   }

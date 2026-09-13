@@ -60,3 +60,19 @@ export const issueActivationCode = () =>
   api<{ value: string; expiresAt: string; serverTime: string }>('/activation/codes', { method: 'POST', headers: { 'Idempotency-Key': idempotencyKey() } });
 export const revokeDevice = (deviceId: string) =>
   api('/devices/revoke', { method: 'POST', body: JSON.stringify({ deviceId }) });
+
+export interface EventView {
+  id: string; deviceId: string | null; category: string; type: string; severity: string; source: string; payload: unknown; occurredAt: string;
+}
+export interface CommandView {
+  id: string; deviceId: string; type: string; payload: unknown; status: string; createdAt: string; expiresAt: string; deliveredAt: string | null; executedAt: string | null; result: string | null;
+}
+export type CommandType = 'REQUEST_CHECKIN' | 'SYNC_NOW' | 'SHOW_MESSAGE' | 'RING_DEVICE' | 'REFRESH_DEVICE_INFO';
+
+export const deviceTimeline = (deviceId: string) => api<{ events: EventView[]; serverTime: string }>(`/devices/${deviceId}/events`);
+export const listDeviceCommands = (deviceId: string) => api<{ commands: CommandView[]; serverTime: string }>(`/devices/${deviceId}/commands`);
+export const enqueueCommand = (deviceId: string, type: CommandType, payload?: { text: string }) =>
+  api<CommandView>(`/devices/${deviceId}/commands`, {
+    method: 'POST', headers: { 'Idempotency-Key': idempotencyKey() },
+    body: JSON.stringify(payload ? { type, payload } : { type }),
+  });

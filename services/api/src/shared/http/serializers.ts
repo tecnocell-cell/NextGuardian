@@ -62,6 +62,58 @@ export function subscriptionView(subscription: SubscriptionRecord) {
   };
 }
 
+export interface EventRecord {
+  eventId: string;
+  deviceId: string | null;
+  category: string;
+  type: string;
+  severity: string;
+  source: string;
+  payload: unknown;
+  occurredAt: Date;
+}
+
+export function eventView(event: EventRecord) {
+  return {
+    id: event.eventId,
+    deviceId: event.deviceId,
+    category: event.category,
+    type: event.type,
+    severity: event.severity,
+    source: event.source,
+    payload: event.payload ?? null,
+    occurredAt: event.occurredAt.toISOString(),
+  };
+}
+
+export interface CommandRecord {
+  commandId: string;
+  deviceId: string;
+  type: string;
+  payload: unknown;
+  status: string;
+  createdAt: Date;
+  expiresAt: Date;
+  deliveredAt: Date | null;
+  executedAt: Date | null;
+  result: string | null;
+}
+
+export function commandView(command: CommandRecord) {
+  return {
+    id: command.commandId,
+    deviceId: command.deviceId,
+    type: command.type,
+    payload: command.payload ?? null,
+    status: command.status,
+    createdAt: command.createdAt.toISOString(),
+    expiresAt: command.expiresAt.toISOString(),
+    deliveredAt: command.deliveredAt ? command.deliveredAt.toISOString() : null,
+    executedAt: command.executedAt ? command.executedAt.toISOString() : null,
+    result: command.result,
+  };
+}
+
 export function deviceSessionView(
   session: { sessionId: string; deviceId: string; accessExpiresAt: Date },
   tokens: { accessToken: string; refreshToken: string },

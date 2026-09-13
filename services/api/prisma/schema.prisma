@@ -83,6 +83,8 @@ model Workspace {
   devices Device[]
   pairings Pairing[]
   deviceSessions DeviceSession[]
+  events Event[]
+  commands Command[]
 }
 
 // Global identity, as defined by doc 21; authentication lives in the auth module.
@@ -185,6 +187,7 @@ model Device {
   workspace Workspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Restrict)
   sessions DeviceSession[]
   pairings Pairing[]
+  commands Command[]
 
   @@index([workspaceId])
 }
@@ -221,5 +224,73 @@ model DeviceSession {
   workspace Workspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Restrict)
 
   @@index([deviceId])
+  @@index([workspaceId])
+}
+
+enum EventCategory {
+  DEVICE
+  ENROLLMENT
+  COMMAND
+  SECURITY
+}
+
+enum EventSeverity {
+  INFO
+  NOTICE
+  WARNING
+  CRITICAL
+}
+
+enum CommandType {
+  REQUEST_CHECKIN
+  SYNC_NOW
+  SHOW_MESSAGE
+  RING_DEVICE
+  REFRESH_DEVICE_INFO
+}
+
+enum CommandStatus {
+  QUEUED
+  DELIVERED
+  EXECUTED
+  FAILED
+  EXPIRED
+  CANCELLED
+}
+
+// Append-only timeline entry. No private content in payload (doc 14).
+model Event {
+  eventId String @id @default(uuid()) @db.Uuid
+  workspaceId String @db.Uuid
+  deviceId String? @db.Uuid
+  category EventCategory
+  type String
+  severity EventSeverity @default(INFO)
+  source String
+  payload Json?
+  occurredAt DateTime @default(now())
+  workspace Workspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Restrict)
+
+  @@index([workspaceId, deviceId, occurredAt])
+}
+
+// Server->device command with a closed catalog, idempotent lifecycle and expiry (doc 15).
+model Command {
+  commandId String @id @default(uuid()) @db.Uuid
+  workspaceId String @db.Uuid
+  deviceId String @db.Uuid
+  type CommandType
+  payload Json?
+  status CommandStatus @default(QUEUED)
+  requestedBy String? @db.Uuid
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  deliveredAt DateTime?
+  executedAt DateTime?
+  result String?
+  device Device @relation(fields: [deviceId], references: [deviceId], onDelete: Restrict)
+  workspace Workspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Restrict)
+
+  @@index([deviceId, status])
   @@index([workspaceId])
 }

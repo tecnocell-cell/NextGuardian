@@ -41,7 +41,7 @@ describe('WP-102 real PostgreSQL isolation', () => {
 
   it('migration is applied to PostgreSQL, not a mock', async () => {
     const rows = await db.$queryRaw<Array<{ migration_name: string }>>`SELECT migration_name FROM "_prisma_migrations" WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL`;
-    expect(rows.map(row => row.migration_name)).toEqual(['20260912000100_workspace_base', '20260913000100_enrollment_core']);
+    expect(rows.map(row => row.migration_name)).toEqual(['20260912000100_workspace_base', '20260913000100_enrollment_core', '20260913000200_events_commands']);
     const version = await db.$queryRaw<Array<{ version: string }>>`SELECT version()`;
     expect(version[0].version).toContain('PostgreSQL');
   });

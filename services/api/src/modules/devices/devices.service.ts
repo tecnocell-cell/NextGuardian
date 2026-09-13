@@ -14,12 +14,13 @@ import { DEVICE_ACCESS_TTL, DEVICE_REFRESH_TTL, MINUTE, PAIRING_TICKET_TTL } fro
 import { serverTime } from '../../shared/http/validation.js';
 import { deviceInfoView, deviceSessionView, deviceSummaryView, deviceView, subscriptionView } from '../../shared/http/serializers.js';
 import type { Principal } from '../../shared/auth/principal.js';
+import { EventsService } from '../events/events.service.js';
 
 const ONLINE_WINDOW = 10 * MINUTE;
 
 @Injectable()
 export class DevicesService {
-  constructor(private readonly repo: DevicesRepository) {}
+  constructor(private readonly repo: DevicesRepository, private readonly events: EventsService) {}
 
   // Authorized by the activation ticket (from /activation/validate) in the Authorization header.
   async pair(ticketToken: string | null, input: PairInput) {
@@ -74,6 +75,10 @@ export class DevicesService {
         refreshExpiresAt: tokens.refreshExpiresAt,
       },
     });
+    await this.events.record({
+      workspaceId: pairing.workspaceId, deviceId: input.deviceId, category: 'ENROLLMENT',
+      type: 'DEVICE_PAIRED', severity: 'NOTICE', source: 'SERVER', payload: { name: result.device.name },
+    });
     return {
       device: deviceView(result.device),
       session: deviceSessionView(result.session, tokens),
@@ -118,6 +123,10 @@ export class DevicesService {
   async revoke(principal: Principal, input: RevokeInput) {
     const device = await this.repo.revoke(principal.workspaceId, input.deviceId);
     if (!device) throw new NotFoundException('Device not found in workspace');
+    await this.events.record({
+      workspaceId: principal.workspaceId, deviceId: input.deviceId, category: 'ENROLLMENT',
+      type: 'DEVICE_REVOKED', severity: 'WARNING', source: principal.kind === 'device' ? 'AGENT' : 'ADMIN',
+    });
     return { device: deviceView(device), serverTime: serverTime() };
   }
 

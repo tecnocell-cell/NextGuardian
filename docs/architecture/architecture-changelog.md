@@ -20,6 +20,18 @@ Build/typecheck/lint PASS; 11 testes em 2 suites PASS; processo compilado retorn
 Corrigidas referências documentais WP-001→WP-101; ajustada compatibilidade ESM/Nest e ferramentas. [Relatório completo e aceite](wp-101-bootstrap-report.md). WP-102 NÃO INICIADO. Trabalho parado.
 
 
+## Rodada 12 — Event platform + Command Center (Core) (2026-09-13)
+
+**Backend (`services/api`):** plataforma de eventos e centro de comandos (Core, fases 3+4 sem FCM — entrega por poll autenticado).
+- **Modelo:** `Event` (append-only, taxonomia) e `Command` (catálogo fechado, ciclo de vida, expiração) + enums; migração `20260913000200_events_commands`.
+- **Endpoints (6):** `GET /events`, `GET /devices/{id}/events` (timeline); `POST/GET /devices/{id}/commands` (console); `GET /agent/commands`, `POST /agent/commands/{id}/ack` (agente). Contrato OpenAPI em **18 paths**.
+- **Comandos:** catálogo `REQUEST_CHECKIN/SYNC_NOW/SHOW_MESSAGE/RING_DEVICE/REFRESH_DEVICE_INFO`; QUEUED→DELIVERED (no fetch)→EXECUTED/FAILED (no ack); expiração; **sem execução arbitrária**. Eventos emitidos no enrollment/revoke e no ciclo do comando.
+- **Verificado:** typecheck/lint/build + contrato; **30 testes de integração** (12 workspace + 10 enrollment + 4 console + **4 eventos/comandos**), com isolamento por workspace.
+
+**Web (`apps/web-admin`):** detalhe do dispositivo ganhou **Timeline** (eventos) e **Comandos** (lista + botões: check-in, sync, tocar, atualizar info, mensagem). `npm run build` verde.
+
+**Cobre:** event platform + command center (Core). FCM fica para quando houver projeto Firebase; hoje o agente busca por poll (`GET /agent/commands`).
+
 ## Rodada 11 — WP-201: console web + API de conta (2026-09-13)
 
 **Backend (`services/api`):** novos endpoints escopados por conta para o console — `GET /account/me` (workspace/usuário/contagem de dispositivos), `GET /devices` (lista do workspace), `POST /activation/codes` (emitir código). Contrato OpenAPI atualizado (13 paths; validador ajustado). CORS habilitado (Bearer, sem cookies). Guard de conta reutilizado; isolamento por workspace mantido. **26 testes de integração** (12 workspace + 10 enrollment + **4 console**), 19 unit, typecheck/lint/contrato verdes.
