@@ -302,6 +302,11 @@ model Policy {
   workspaceId String @unique @db.Uuid
   minAppVersion String @default("0.0.0")
   maxOfflineHours Int @default(24)
+  riskWeightNotPaired Int @default(40)
+  riskWeightOfflineTooLong Int @default(25)
+  riskWeightAgentOutdated Int @default(15)
+  riskWeightNeverSeen Int @default(10)
+  riskWeightRevoked Int @default(50)
   active Boolean @default(true)
   updatedAt DateTime @updatedAt
   workspace Workspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Restrict)

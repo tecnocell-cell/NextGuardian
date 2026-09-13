@@ -10,7 +10,18 @@ export class PolicyRepository {
     return this.db.policy.upsert({ where: { workspaceId }, create: { workspaceId }, update: {} });
   }
 
-  updatePolicy(workspaceId: string, data: { minAppVersion?: string; maxOfflineHours?: number }) {
+  updatePolicy(
+    workspaceId: string,
+    data: {
+      minAppVersion?: string;
+      maxOfflineHours?: number;
+      riskWeightNotPaired?: number;
+      riskWeightOfflineTooLong?: number;
+      riskWeightAgentOutdated?: number;
+      riskWeightNeverSeen?: number;
+      riskWeightRevoked?: number;
+    },
+  ) {
     return this.db.policy.update({ where: { workspaceId }, data });
   }
 

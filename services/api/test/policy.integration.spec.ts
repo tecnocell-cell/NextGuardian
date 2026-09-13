@@ -70,6 +70,18 @@ describe('policy + risk (real PostgreSQL)', () => {
     expect(summary.body.nonCompliant).toBe(1);
   });
 
+  it('applies configurable per-tenant risk weights', async () => {
+    const { accountToken, deviceId } = await enrolledAccount();
+    await http.put('/policy').set('Authorization', `Bearer ${accountToken}`).send({ minAppVersion: '0.2.0' }).expect(200);
+    const before = await http.get(`/devices/${deviceId}/risk`).set('Authorization', `Bearer ${accountToken}`).expect(200);
+    expect(before.body.reasons.find((r: { code: string }) => r.code === 'AGENT_OUTDATED').weight).toBe(15);
+    const upd = await http.put('/policy').set('Authorization', `Bearer ${accountToken}`).send({ weights: { agentOutdated: 70 } }).expect(200);
+    expect(upd.body.policy.weights.agentOutdated).toBe(70);
+    const after = await http.get(`/devices/${deviceId}/risk`).set('Authorization', `Bearer ${accountToken}`).expect(200);
+    expect(after.body.reasons.find((r: { code: string }) => r.code === 'AGENT_OUTDATED').weight).toBe(70);
+    expect(after.body.score).toBe(70);
+  });
+
   it('does not expose risk for a device in another workspace', async () => {
     const a = await enrolledAccount();
     const email = `${randomUUID()}@example.invalid`;

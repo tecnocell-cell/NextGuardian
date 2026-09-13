@@ -1,7 +1,31 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PolicyRepository } from './policy.repository.js';
-import { evaluateRisk } from './risk.js';
+import { evaluateRisk, type PolicyThresholds } from './risk.js';
 import { serverTime } from '../../shared/http/validation.js';
+
+interface PolicyRow {
+  minAppVersion: string;
+  maxOfflineHours: number;
+  riskWeightNotPaired: number;
+  riskWeightOfflineTooLong: number;
+  riskWeightAgentOutdated: number;
+  riskWeightNeverSeen: number;
+  riskWeightRevoked: number;
+}
+
+function thresholdsOf(policy: PolicyRow): PolicyThresholds {
+  return {
+    minAppVersion: policy.minAppVersion,
+    maxOfflineHours: policy.maxOfflineHours,
+    weights: {
+      notPaired: policy.riskWeightNotPaired,
+      offlineTooLong: policy.riskWeightOfflineTooLong,
+      agentOutdated: policy.riskWeightAgentOutdated,
+      neverSeen: policy.riskWeightNeverSeen,
+      revoked: policy.riskWeightRevoked,
+    },
+  };
+}
 
 @Injectable()
 export class RiskService {
@@ -13,7 +37,7 @@ export class RiskService {
     const policy = await this.repo.ensurePolicy(workspaceId);
     const result = evaluateRisk(
       { pairingState: device.pairingState, appVersion: device.appVersion, lastSyncAt: device.lastSyncAt },
-      { minAppVersion: policy.minAppVersion, maxOfflineHours: policy.maxOfflineHours },
+      thresholdsOf(policy),
       new Date(),
     );
     return { deviceId, ...result, serverTime: serverTime() };
@@ -21,7 +45,7 @@ export class RiskService {
 
   async workspaceRisk(workspaceId: string) {
     const policy = await this.repo.ensurePolicy(workspaceId);
-    const thresholds = { minAppVersion: policy.minAppVersion, maxOfflineHours: policy.maxOfflineHours };
+    const thresholds = thresholdsOf(policy);
     const now = new Date();
     const devices = await this.repo.listDevices(workspaceId);
     const items = devices.map(device => {

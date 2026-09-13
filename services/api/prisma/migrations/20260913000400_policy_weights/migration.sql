@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "Policy" ADD COLUMN     "riskWeightAgentOutdated" INTEGER NOT NULL DEFAULT 15,
+ADD COLUMN     "riskWeightNeverSeen" INTEGER NOT NULL DEFAULT 10,
+ADD COLUMN     "riskWeightNotPaired" INTEGER NOT NULL DEFAULT 40,
+ADD COLUMN     "riskWeightOfflineTooLong" INTEGER NOT NULL DEFAULT 25,
+ADD COLUMN     "riskWeightRevoked" INTEGER NOT NULL DEFAULT 50;
+

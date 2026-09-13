@@ -4150,11 +4150,50 @@
           "updatedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "weights": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "notPaired": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "offlineTooLong": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "agentOutdated": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "neverSeen": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "revoked": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              }
+            },
+            "required": [
+              "notPaired",
+              "offlineTooLong",
+              "agentOutdated",
+              "neverSeen",
+              "revoked"
+            ]
           }
         },
         "required": [
           "minAppVersion",
           "maxOfflineHours",
+          "weights",
           "active",
           "updatedAt"
         ]
@@ -4188,6 +4227,37 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 8760
+          },
+          "weights": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "notPaired": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "offlineTooLong": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "agentOutdated": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "neverSeen": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "revoked": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              }
+            }
           }
         }
       },
