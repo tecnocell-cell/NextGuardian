@@ -12,6 +12,9 @@ android {
         versionCode = 1
         versionName = "0.1.0-demo"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // Real API is opt-in; the default demo build keeps the offline mock.
+        buildConfigField("boolean", "USE_REAL_API", "false")
+        buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:3000\"")
     }
     buildFeatures { compose = true; buildConfig = true }
     compileOptions {

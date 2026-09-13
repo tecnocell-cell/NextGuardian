@@ -30,7 +30,7 @@ Monorepo em `C:/Users/Root/Documents/nexguardian`. Existe uma **fundação Andro
 - Tenancy neutra `Workspace` (ADR-0003 ACEITA); trial/limites **configuráveis** (ADR-0011); stack NestJS/TypeScript/PostgreSQL/Prisma (ADR-0012 ACEITA). Persistência base implementada/testada no WP-102; autenticação não implementada.
 
 ## 6. Estado dos pacotes
-WP-001, WP-101, WP-102 concluídos (ver [relatório WP-102](wp-102-persistence-report.md)). **WP-103 (auth), WP-104 (device/enrollment/activation) e WP-105 (trial/entitlements) concluídos** — os 10 endpoints do OpenAPI estão implementados e testados. Próximos: **WP-301** (integrar o agente Android à API real) e **WP-201** (console operacional web). Não encadear execução sem autorização.
+WP-001, WP-101, WP-102 concluídos (ver [relatório WP-102](wp-102-persistence-report.md)). **WP-103/104/105 concluídos** — os 10 endpoints do OpenAPI implementados e testados. **WP-301 concluído** — o agente Android tem cliente HTTP real (`core/network` + `data/RemoteActivationRepository`) atrás da flag `USE_REAL_API` (default mock); 26 testes unit JVM + APK + lint verdes. Próximo: **WP-201** (console operacional web). Não encadear execução sem autorização.
 
 ## 7. O que NÃO refazer / NÃO fazer
 Não reescrever a fundação Android; **não renomear** applicationId/namespace/rootProject (seguem `nexguardian`); não implementar todas as fases; não conectar produção; não substituir mocks em massa; **não** implementar capacidades exclusivas de Business (DO/PO, lock/wipe) no MVP; nada clandestino/root/evasão; não introduzir microserviços.

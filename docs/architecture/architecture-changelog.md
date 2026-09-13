@@ -20,6 +20,19 @@ Build/typecheck/lint PASS; 11 testes em 2 suites PASS; processo compilado retorn
 Corrigidas referências documentais WP-001→WP-101; ajustada compatibilidade ESM/Nest e ferramentas. [Relatório completo e aceite](wp-101-bootstrap-report.md). WP-102 NÃO INICIADO. Trabalho parado.
 
 
+## Rodada 10 — WP-301: agente Android ↔ API real (2026-09-13)
+
+**Implementado (atrás da flag `USE_REAL_API`, default false → mock preservado):**
+- `core/network`: JSON puro (parser/encoder sem dependências), `HttpClient`/`JdkHttpClient` (HttpURLConnection), `NexGuardianApi` (chamadas tipadas do contrato), `RemoteStateStore` + `DataStoreRemoteStateStore`.
+- `data/RemoteActivationRepository`: implementa a **mesma porta** `ActivationRepository`, orquestrando validate → pair → confirm → heartbeat → revoke contra a API real; domínio e telas **inalterados**.
+- Manifesto: permissão `INTERNET` + `network_security_config` (cleartext só para hosts de dev: 10.0.2.2/localhost); `usesCleartextTraffic=false` mantido. BuildConfig `USE_REAL_API`/`API_BASE_URL`. Fiação por flag em `NexGuardianApplication`.
+
+**Verificação:** sem novas dependências; **26 testes unitários JVM** (14 domínio + 5 JSON + 4 API + 3 repositório real), `assembleDebug` (APK monta) e `lintDebug` verdes. Testes instrumentados (emulador) não executados neste ambiente.
+
+**Nota:** tokens ficam em DataStore app-privado (backup desabilitado) como interim; proteção via Keystore é hardening planejado (docs 18/22). Distinção INVALID/EXPIRED da ativação simplificada para INVALID no cliente (servidor retorna 400 para ambos) — melhoria futura com código de erro no contrato.
+
+**Cobre:** WP-301. Próximo: WP-201 (console operacional web).
+
 ## Rodada 9 — Implementação do backend Core (MVP) (2026-09-13)
 
 **Pedido:** começar a implantação forte e deixar a estrutura pronta (repo/commit depois).
