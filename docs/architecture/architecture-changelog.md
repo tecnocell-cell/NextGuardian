@@ -20,6 +20,18 @@ Build/typecheck/lint PASS; 11 testes em 2 suites PASS; processo compilado retorn
 Corrigidas referências documentais WP-001→WP-101; ajustada compatibilidade ESM/Nest e ferramentas. [Relatório completo e aceite](wp-101-bootstrap-report.md). WP-102 NÃO INICIADO. Trabalho parado.
 
 
+## Rodada 14 — Fase 6: Políticas, Compliance e Device Risk Score (2026-09-13)
+
+**Backend (`services/api`):** avaliação de conformidade e **risco explicável** (server-side, fase 6 do roadmap).
+- **Modelo:** `Policy` por workspace (limiares configuráveis: `minAppVersion`, `maxOfflineHours`); migração `20260913000300_policy`.
+- **Núcleo puro** `risk.ts`: `evaluateRisk(device, policy, now)` → score 0–100, nível, compliance e **razões legíveis** (NOT_PAIRED, OFFLINE_TOO_LONG, AGENT_OUTDATED, NEVER_SEEN, ENROLLMENT_REVOKED). Determinístico e testado isoladamente.
+- **Endpoints (4):** `GET/PUT /policy`; `GET /risk` (resumo do workspace + `nonCompliant`); `GET /devices/{id}/risk` (score explicável). Contrato em **21 paths**.
+- **Verificado:** **25 testes unit** (6 novos de risco) + **34 integração** (4 novos de política/risco, incl. isolamento), typecheck/lint/build + contrato verdes.
+
+**Web (`apps/web-admin`):** detalhe do dispositivo com card **Risco e conformidade** (score, nível, compliance, fatores com peso); dashboard com contador **Não conformes**. `npm run build` verde.
+
+**Nota:** cada ponto do score é explicável (mostra a razão), como no doc 16. Pesos são constantes no MVP; tornar configuráveis por tenant é evolução.
+
 ## Rodada 13 — Agente consome comandos (2026-09-13)
 
 Fecha o ciclo do command center no agente Android: `NexGuardianApi` ganhou `fetchCommands`/`ackCommand`; `RemoteActivationRepository.simulateHeartbeat` passa a **buscar comandos pendentes e confirmá-los (EXECUTED)** por poll autenticado, best-effort (falha no pull não quebra o heartbeat). Catálogo fechado; check-in/sync satisfeitos pelo próprio heartbeat. Sem tocar domínio/porta/mock. **26 testes unit JVM** (novo: heartbeat busca+ack comando), `assembleDebug` e `lintDebug` verdes. Efeitos visíveis (notificação/toque) ficam como follow-up de UX.

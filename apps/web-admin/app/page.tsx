@@ -1,18 +1,19 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Shell, Card } from '@/components/Shell';
-import { getAccount, listDevices, getSubscription, type AccountMe, type DeviceSummary, type Subscription } from '@/lib/api';
+import { getAccount, listDevices, getSubscription, workspaceRisk, type AccountMe, type DeviceSummary, type Subscription } from '@/lib/api';
 import { presenceOf } from '@/lib/presence';
 
 export default function DashboardPage() {
   const [account, setAccount] = useState<AccountMe | null>(null);
   const [devices, setDevices] = useState<DeviceSummary[]>([]);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [nonCompliant, setNonCompliant] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([getAccount(), listDevices(), getSubscription()])
-      .then(([a, d, s]) => { setAccount(a); setDevices(d.devices); setSubscription(s.subscription); })
+    Promise.all([getAccount(), listDevices(), getSubscription(), workspaceRisk()])
+      .then(([a, d, s, r]) => { setAccount(a); setDevices(d.devices); setSubscription(s.subscription); setNonCompliant(r.nonCompliant); })
       .catch(() => setError('Não foi possível carregar os dados.'));
   }, []);
 
@@ -34,8 +35,8 @@ export default function DashboardPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <Stat label="Dispositivos" value={account?.deviceCount ?? devices.length} />
         <Stat label="Online" value={counts.ONLINE} />
-        <Stat label="Recentes" value={counts.RECENT} />
         <Stat label="Offline" value={counts.OFFLINE + counts.STALE + counts.NEVER_SEEN} />
+        <Stat label="Não conformes" value={nonCompliant} />
       </div>
       <Card title="Assinatura">
         {subscription

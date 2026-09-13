@@ -85,6 +85,7 @@ model Workspace {
   deviceSessions DeviceSession[]
   events Event[]
   commands Command[]
+  policy Policy?
 }
 
 // Global identity, as defined by doc 21; authentication lives in the auth module.
@@ -293,4 +294,15 @@ model Command {
 
   @@index([deviceId, status])
   @@index([workspaceId])
+}
+
+// Per-workspace compliance policy; thresholds are configurable data (ADR-0011).
+model Policy {
+  policyId String @id @default(uuid()) @db.Uuid
+  workspaceId String @unique @db.Uuid
+  minAppVersion String @default("0.0.0")
+  maxOfflineHours Int @default(24)
+  active Boolean @default(true)
+  updatedAt DateTime @updatedAt
+  workspace Workspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Restrict)
 }

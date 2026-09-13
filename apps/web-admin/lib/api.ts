@@ -76,3 +76,10 @@ export const enqueueCommand = (deviceId: string, type: CommandType, payload?: { 
     method: 'POST', headers: { 'Idempotency-Key': idempotencyKey() },
     body: JSON.stringify(payload ? { type, payload } : { type }),
   });
+
+export interface RiskReason { code: string; label: string; weight: number }
+export interface DeviceRisk { deviceId: string; score: number; level: string; compliance: string; reasons: RiskReason[]; serverTime: string }
+export interface WorkspaceRisk { devices: { deviceId: string; name: string; score: number; level: string; compliance: string }[]; nonCompliant: number; serverTime: string }
+
+export const deviceRisk = (deviceId: string) => api<DeviceRisk>(`/devices/${deviceId}/risk`);
+export const workspaceRisk = () => api<WorkspaceRisk>('/risk');

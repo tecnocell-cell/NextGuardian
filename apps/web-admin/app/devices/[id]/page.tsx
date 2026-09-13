@@ -3,8 +3,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { Shell, Card } from '@/components/Shell';
 import {
-  listDevices, revokeDevice, deviceTimeline, listDeviceCommands, enqueueCommand,
-  type DeviceSummary, type EventView, type CommandView, type CommandType,
+  listDevices, revokeDevice, deviceTimeline, listDeviceCommands, enqueueCommand, deviceRisk,
+  type DeviceSummary, type EventView, type CommandView, type CommandType, type DeviceRisk,
 } from '@/lib/api';
 import { presenceOf, presenceLabel } from '@/lib/presence';
 
@@ -21,16 +21,18 @@ export default function DeviceDetailPage() {
   const [device, setDevice] = useState<DeviceSummary | null>(null);
   const [events, setEvents] = useState<EventView[]>([]);
   const [commands, setCommands] = useState<CommandView[]>([]);
+  const [risk, setRisk] = useState<DeviceRisk | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
     try {
-      const [devs, tl, cmds] = await Promise.all([listDevices(), deviceTimeline(params.id), listDeviceCommands(params.id)]);
+      const [devs, tl, cmds, rsk] = await Promise.all([listDevices(), deviceTimeline(params.id), listDeviceCommands(params.id), deviceRisk(params.id)]);
       const found = devs.devices.find((d) => d.id === params.id) ?? null;
       setDevice(found);
       setEvents(tl.events);
       setCommands(cmds.commands);
+      setRisk(rsk);
       if (!found) setError('Dispositivo não encontrado.');
     } catch {
       setError('Não foi possível carregar o dispositivo.');
@@ -82,6 +84,31 @@ export default function DeviceDetailPage() {
               <Row k="Rede" v={device.networkType ?? '—'} />
             </Card>
           </div>
+
+          {risk && (
+            <div className="mt-4">
+              <Card title="Risco e conformidade">
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="text-3xl font-semibold">{risk.score}</div>
+                  <div>
+                    <div className="text-sm">Nível: <b>{({ low: 'baixo', medium: 'médio', high: 'alto' } as Record<string, string>)[risk.level] ?? risk.level}</b></div>
+                    <div className="text-sm">Conformidade: <b>{risk.compliance}</b></div>
+                  </div>
+                </div>
+                {risk.reasons.length === 0 ? (
+                  <p className="text-sm text-slate-500">Sem fatores de risco.</p>
+                ) : (
+                  <ul className="text-sm divide-y divide-slate-100 dark:divide-slate-800">
+                    {risk.reasons.map((r) => (
+                      <li key={r.code} className="py-1.5 flex justify-between">
+                        <span>{r.label}</span><span className="text-slate-500">+{r.weight}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Card>
+            </div>
+          )}
 
           <div className="mt-4">
             <Card title="Comandos">

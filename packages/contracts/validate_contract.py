@@ -19,5 +19,5 @@ validator.validate(sample)
 assert not validator.is_valid(dict(sample, location={"lat": 0, "lon": 0}))
 assert not validator.is_valid(dict(sample, batteryLevel=101))
 assert not validator.is_valid(dict(sample, deviceId="hardware-serial"))
-assert len(spec["paths"]) == 18
+assert len(spec["paths"]) == 21
 print("PASS: OpenAPI 3.1 + 4 heartbeat cases (valid, private field, battery, UUID).")

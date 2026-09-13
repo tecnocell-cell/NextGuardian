@@ -135,4 +135,4 @@ Score = soma dos fatores ativos, saturado em 100. Faixas: 0–29 baixo, 30–69 
 
 ### 10. Estado atual
 
-**NÃO EXISTE.** Fase 6, depois de device state, políticas e eventos.
+**IMPLEMENTADO** (rodada 14): núcleo puro `services/api/src/modules/policy/risk.ts` (`evaluateRisk`), `Policy` por workspace com limiares configuráveis, e endpoints `GET/PUT /policy`, `GET /risk`, `GET /devices/{id}/risk`. Score explicável (razões com peso), compliance e nível. Exposto no console (card de risco no detalhe do dispositivo + contador de não conformes no dashboard). Pesos são constantes no MVP; localização/geofence (Partes I–II) seguem pendentes (Fase 5, exigem trabalho no aparelho).
