@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.Instant
 
@@ -59,5 +60,27 @@ class RemoteActivationRepositoryTest {
         repository.revoke()
         assertEquals(DevicePairingState.REVOKED, session.sessions.first().pairingState)
         assertNull(state.state.first().accessToken)
+    }
+
+    @Test fun heartbeatFetchesAndAcksPendingCommands() = runTest {
+        val acked = mutableListOf<String>()
+        val session = InMemorySessionStore()
+        val state = InMemoryRemoteStateStore()
+        val api = NexGuardianApi(FakeHttpClient { _, path, _, _ ->
+            when {
+                path == "/agent/commands" -> HttpResult(200, """{"commands":[{"id":"cmd-1","type":"RING_DEVICE"}],"serverTime":"t"}""")
+                path.startsWith("/agent/commands/") && path.endsWith("/ack") -> {
+                    acked.add(path)
+                    HttpResult(200, """{"id":"cmd-1","deviceId":"d","type":"RING_DEVICE","status":"EXECUTED"}""")
+                }
+                else -> route(path)
+            }
+        }) { "idem" }
+        val repository = RemoteActivationRepository(api, session, state, info, uuid = { "dev-uuid" }, now = { Instant.parse("2026-01-01T00:00:00Z") })
+        repository.validate("NG-1")
+        repository.confirm()
+        repository.simulateHeartbeat()
+        assertEquals(1, acked.size)
+        assertTrue(acked[0].contains("cmd-1"))
     }
 }

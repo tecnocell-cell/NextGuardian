@@ -5,6 +5,7 @@ import java.util.UUID
 
 class ApiException(val status: Int, message: String) : Exception(message)
 
+data class AgentCommand(val id: String, val type: String)
 data class ValidateResult(val activationTicket: String, val accountDisplayName: String, val expiresAt: String)
 data class PairResult(val pairingId: String, val pairingTicket: String)
 data class ConfirmResult(
@@ -88,6 +89,21 @@ class NexGuardianApi(
     suspend fun revoke(accessToken: String, deviceId: String) {
         val result = http.postJson("/devices/revoke", accessToken, idempotencyKey(), Json.encode(mapOf("deviceId" to deviceId)))
         success(result)
+    }
+
+    suspend fun fetchCommands(accessToken: String): List<AgentCommand> {
+        val body = success(http.getJson("/agent/commands", accessToken))
+        val commands = body.fields["commands"] as? JsonArray ?: return emptyList()
+        return commands.items.mapNotNull { item ->
+            (item as? JsonObject)?.let { AgentCommand(it.str("id").orEmpty(), it.str("type").orEmpty()) }
+        }
+    }
+
+    suspend fun ackCommand(accessToken: String, commandId: String, status: String, result: String? = null) {
+        val payload = HashMap<String, Any?>()
+        payload["status"] = status
+        if (result != null) payload["result"] = result
+        success(http.postJson("/agent/commands/$commandId/ack", accessToken, null, Json.encode(payload)))
     }
 
     private fun success(result: HttpResult): JsonObject {

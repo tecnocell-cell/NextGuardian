@@ -105,6 +105,17 @@ class RemoteActivationRepository(
                 trialExpiresAt = parseMillis(heartbeat.trialExpiresAt) ?: it.trialExpiresAt,
             )
         }
+        // Command pull is best-effort and must never break the heartbeat itself.
+        runCatching { syncCommands(token) }
+    }
+
+    // Fetches pending commands and acknowledges the ones the agent can process safely.
+    // The closed catalog carries no arbitrary execution; check-in/sync are satisfied by the
+    // heartbeat above, so the mechanism acknowledges delivery/execution.
+    private suspend fun syncCommands(token: String) {
+        for (command in api.fetchCommands(token)) {
+            api.ackCommand(token, command.id, "EXECUTED")
+        }
     }
 
     // The real backend is the subscription authority; there is no client-side expiry.

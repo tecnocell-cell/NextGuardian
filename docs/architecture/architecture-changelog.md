@@ -20,6 +20,10 @@ Build/typecheck/lint PASS; 11 testes em 2 suites PASS; processo compilado retorn
 Corrigidas referências documentais WP-001→WP-101; ajustada compatibilidade ESM/Nest e ferramentas. [Relatório completo e aceite](wp-101-bootstrap-report.md). WP-102 NÃO INICIADO. Trabalho parado.
 
 
+## Rodada 13 — Agente consome comandos (2026-09-13)
+
+Fecha o ciclo do command center no agente Android: `NexGuardianApi` ganhou `fetchCommands`/`ackCommand`; `RemoteActivationRepository.simulateHeartbeat` passa a **buscar comandos pendentes e confirmá-los (EXECUTED)** por poll autenticado, best-effort (falha no pull não quebra o heartbeat). Catálogo fechado; check-in/sync satisfeitos pelo próprio heartbeat. Sem tocar domínio/porta/mock. **26 testes unit JVM** (novo: heartbeat busca+ack comando), `assembleDebug` e `lintDebug` verdes. Efeitos visíveis (notificação/toque) ficam como follow-up de UX.
+
 ## Rodada 12 — Event platform + Command Center (Core) (2026-09-13)
 
 **Backend (`services/api`):** plataforma de eventos e centro de comandos (Core, fases 3+4 sem FCM — entrega por poll autenticado).
