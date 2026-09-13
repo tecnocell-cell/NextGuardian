@@ -1,0 +1,225 @@
+generator client {
+  provider = "prisma-client"
+  output = "../src/generated/prisma"
+  moduleFormat = "esm"
+  generatedFileExtension = "ts"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum WorkspaceProfile {
+  INDIVIDUAL
+  FAMILY
+  BUSINESS
+}
+
+enum WorkspaceStatus {
+  ACTIVE
+  SUSPENDED
+  CLOSED
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum MembershipStatus {
+  ACTIVE
+  REVOKED
+}
+
+enum MembershipRole {
+  OWNER
+  ADMIN
+  OPERATOR
+  VIEWER
+}
+
+enum SessionStatus {
+  ACTIVE
+  REVOKED
+}
+
+enum SubscriptionState {
+  TRIAL
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum DevicePairingState {
+  UNPAIRED
+  PAIRING_PENDING
+  PAIRED
+  REVOKED
+}
+
+enum ActivationCodeStatus {
+  ISSUED
+  CONSUMED
+  EXPIRED
+}
+
+enum PairingStatus {
+  PENDING
+  CONFIRMED
+  EXPIRED
+  CANCELLED
+}
+
+model Workspace {
+  workspaceId String @id @default(uuid()) @db.Uuid
+  name String
+  profile WorkspaceProfile
+  status WorkspaceStatus @default(ACTIVE)
+  memberships Membership[]
+  sessions Session[]
+  subscription Subscription?
+  activationCodes ActivationCode[]
+  devices Device[]
+  pairings Pairing[]
+  deviceSessions DeviceSession[]
+}
+
+// Global identity, as defined by doc 21; authentication lives in the auth module.
+model User {
+  userId String @id @default(uuid()) @db.Uuid
+  name String
+  email String @unique
+  passwordHash String?
+  status UserStatus @default(ACTIVE)
+  memberships Membership[]
+  sessions Session[]
+}
+
+model Membership {
+  workspaceId String @db.Uuid
+  userId String @db.Uuid
+  role MembershipRole
+  status MembershipStatus @default(ACTIVE)
+  workspace Workspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Restrict)
+  user User @relation(fields: [userId], references: [userId], onDelete: Restrict)
+
+  @@id([workspaceId, userId])
+  @@index([userId])
+}
+
+// Human account session. Only opaque token HASHES are stored; raw tokens never persist.
+model Session {
+  sessionId String @id @default(uuid()) @db.Uuid
+  workspaceId String @db.Uuid
+  userId String @db.Uuid
+  accessTokenHash String @unique
+  refreshTokenHash String @unique
+  accessExpiresAt DateTime
+  refreshExpiresAt DateTime
+  status SessionStatus @default(ACTIVE)
+  createdAt DateTime @default(now())
+  workspace Workspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Restrict)
+  user User @relation(fields: [userId], references: [userId], onDelete: Restrict)
+
+  @@index([userId])
+  @@index([workspaceId])
+}
+
+// Commercial plan; limits/trial are configurable data (ADR-0011).
+model Plan {
+  planId String @id @default(uuid()) @db.Uuid
+  name String
+  profile WorkspaceProfile
+  deviceLimit Int
+  trialDurationHours Int
+  active Boolean @default(true)
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  subscriptionId String @id @default(uuid()) @db.Uuid
+  workspaceId String @unique @db.Uuid
+  planId String @db.Uuid
+  state SubscriptionState @default(TRIAL)
+  trialStartedAt DateTime
+  trialExpiresAt DateTime
+  createdAt DateTime @default(now())
+  workspace Workspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Restrict)
+  plan Plan @relation(fields: [planId], references: [planId], onDelete: Restrict)
+}
+
+// Single-use activation authorization issued to a workspace. Only code/ticket HASHES persist.
+model ActivationCode {
+  activationCodeId String @id @default(uuid()) @db.Uuid
+  workspaceId String @db.Uuid
+  codeHash String @unique
+  status ActivationCodeStatus @default(ISSUED)
+  boundDeviceId String? @db.Uuid
+  ticketHash String? @unique
+  ticketExpiresAt DateTime?
+  expiresAt DateTime
+  attempts Int @default(0)
+  consumedAt DateTime?
+  createdAt DateTime @default(now())
+  workspace Workspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Restrict)
+
+  @@index([workspaceId])
+}
+
+// Device identity in a workspace. deviceId is the client-supplied installation UUID.
+model Device {
+  deviceId String @id @db.Uuid
+  workspaceId String @db.Uuid
+  name String
+  manufacturer String
+  model String
+  androidVersion String
+  appVersion String
+  pairingState DevicePairingState @default(UNPAIRED)
+  lastSyncAt DateTime?
+  batteryLevel Int?
+  networkType String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  workspace Workspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Restrict)
+  sessions DeviceSession[]
+  pairings Pairing[]
+
+  @@index([workspaceId])
+}
+
+// Pending pairing transaction; pairing ticket stored as HASH with short expiry.
+model Pairing {
+  pairingId String @id @default(uuid()) @db.Uuid
+  workspaceId String @db.Uuid
+  deviceId String @db.Uuid
+  status PairingStatus @default(PENDING)
+  ticketHash String @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  confirmedAt DateTime?
+  device Device @relation(fields: [deviceId], references: [deviceId], onDelete: Restrict)
+  workspace Workspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Restrict)
+
+  @@index([deviceId])
+  @@index([workspaceId])
+}
+
+// Device session, separate from account and FCM. Only token HASHES persist; refresh rotates.
+model DeviceSession {
+  sessionId String @id @default(uuid()) @db.Uuid
+  workspaceId String @db.Uuid
+  deviceId String @db.Uuid
+  accessTokenHash String @unique
+  refreshTokenHash String @unique
+  accessExpiresAt DateTime
+  refreshExpiresAt DateTime
+  status SessionStatus @default(ACTIVE)
+  createdAt DateTime @default(now())
+  device Device @relation(fields: [deviceId], references: [deviceId], onDelete: Restrict)
+  workspace Workspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Restrict)
+
+  @@index([deviceId])
+  @@index([workspaceId])
+}
