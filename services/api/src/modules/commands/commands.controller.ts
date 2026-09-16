@@ -4,6 +4,7 @@ import { CommandsService } from './commands.service.js';
 import { enqueueCommandSchema, ackCommandSchema } from './commands.dto.js';
 import { parseBody } from '../../shared/http/validation.js';
 import { AccountGuard, DeviceGuard } from '../../shared/auth/guards.js';
+import { MinRole, RolesGuard } from '../../shared/auth/roles.js';
 import { CurrentPrincipal, type Principal } from '../../shared/auth/principal.js';
 
 // Console (account-scoped) command endpoints.
@@ -12,7 +13,8 @@ export class CommandsController {
   constructor(private readonly commands: CommandsService) {}
 
   @Post('devices/:deviceId/commands')
-  @UseGuards(AccountGuard)
+  @UseGuards(AccountGuard, RolesGuard)
+  @MinRole('OPERATOR')
   @HttpCode(201)
   @Header('Cache-Control', 'no-store')
   enqueue(@CurrentPrincipal() principal: Principal, @Param('deviceId') deviceId: string, @Body() body: unknown) {

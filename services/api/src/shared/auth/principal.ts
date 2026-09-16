@@ -1,12 +1,14 @@
 import { createParamDecorator, type ExecutionContext } from '@nestjs/common';
 import { hashToken } from '../crypto/secrets.js';
 import type { PrismaClient } from '../../generated/prisma/client.js';
+import type { MembershipRole } from '../../generated/prisma/enums.js';
 
 export interface Principal {
   workspaceId: string;
   kind: 'account' | 'device';
   userId?: string;
   deviceId?: string;
+  role?: MembershipRole;
 }
 
 export function bearer(header: unknown): string | null {
@@ -24,7 +26,11 @@ export async function resolveDevicePrincipal(db: PrismaClient, token: string): P
 export async function resolveAccountPrincipal(db: PrismaClient, token: string): Promise<Principal | null> {
   const session = await db.session.findUnique({ where: { accessTokenHash: hashToken(token) } });
   if (!session || session.status !== 'ACTIVE' || session.accessExpiresAt <= new Date()) return null;
-  return { workspaceId: session.workspaceId, userId: session.userId, kind: 'account' };
+  const membership = await db.membership.findUnique({
+    where: { workspaceId_userId: { workspaceId: session.workspaceId, userId: session.userId } },
+  });
+  if (!membership || membership.status !== 'ACTIVE') return null;
+  return { workspaceId: session.workspaceId, userId: session.userId, role: membership.role, kind: 'account' };
 }
 
 export const CurrentPrincipal = createParamDecorator(

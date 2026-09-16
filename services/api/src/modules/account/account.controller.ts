@@ -1,6 +1,7 @@
 import { Controller, Get, Header, HttpCode, Post, UseGuards } from '@nestjs/common';
 import { AccountService } from './account.service.js';
 import { AccountGuard } from '../../shared/auth/guards.js';
+import { MinRole, RolesGuard } from '../../shared/auth/roles.js';
 import { CurrentPrincipal, type Principal } from '../../shared/auth/principal.js';
 
 @Controller()
@@ -15,7 +16,8 @@ export class AccountController {
   }
 
   @Post('activation/codes')
-  @UseGuards(AccountGuard)
+  @UseGuards(AccountGuard, RolesGuard)
+  @MinRole('ADMIN')
   @HttpCode(201)
   @Header('Cache-Control', 'no-store')
   issueCode(@CurrentPrincipal() principal: Principal) {

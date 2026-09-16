@@ -5,6 +5,7 @@ import { RiskService } from './risk.service.js';
 import { updatePolicySchema } from './policy.dto.js';
 import { parseBody } from '../../shared/http/validation.js';
 import { AccountGuard } from '../../shared/auth/guards.js';
+import { MinRole, RolesGuard } from '../../shared/auth/roles.js';
 import { CurrentPrincipal, type Principal } from '../../shared/auth/principal.js';
 
 @Controller()
@@ -19,7 +20,8 @@ export class PolicyController {
   }
 
   @Put('policy')
-  @UseGuards(AccountGuard)
+  @UseGuards(AccountGuard, RolesGuard)
+  @MinRole('ADMIN')
   @Header('Cache-Control', 'no-store')
   update(@CurrentPrincipal() principal: Principal, @Body() body: unknown) {
     return this.policy.update(principal.workspaceId, parseBody(updatePolicySchema, body));
