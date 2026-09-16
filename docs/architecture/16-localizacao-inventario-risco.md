@@ -52,13 +52,17 @@ Geofence {
 
 ### 4. Estado atual
 
-**SERVIDOR IMPLEMENTADO** (rodada 17); **agente e console pendentes**.
+**SERVIDOR E AGENTE IMPLEMENTADOS** (rodadas 17 e 18); **console pendente** (falta o mapa/histórico).
 
 Implementado em `services/api`: `LocationSample` (com `consentVersion`, `observedAt` informativo e `serverReceivedAt` como autoridade), `Geofence` circular e `GeofenceState`; núcleo puro `modules/location/geofence.ts` (`distanceMeters`, `isInside`, `deriveTransition`); endpoints `POST /agent/locations` (lote), `GET /devices/{id}/locations`, `GET/POST /geofences`, `PUT/DELETE /geofences/{id}`; retenção e limiar de frescor configuráveis por tenant na `Policy`; `GEOFENCE_EVENT` na timeline, com payload que nomeia a fence e **nunca** carrega coordenadas.
 
 Regras de §3 honradas no servidor com duas escolhas explícitas: uma amostra só conta como dentro quando `distância + accuracy <= raio` (precisão ruim não fabrica travessia), e um lote acumulado offline avalia geofence **apenas pela amostra mais recente** (não reencena entradas/saídas antigas como se fossem agora).
 
-**Falta para fechar a Fase 5:** coleta no agente Android (permissões, foreground service tipo `location`, fila offline) e o mapa/histórico no console. O consentimento versionado é exigido por amostra no contrato, mas ainda não há registro no servidor para conferir contra — ver [doc 27](27-consentimento-versionado.md).
+Implementado em `apps/android-agent` (rodada 18): `LocationFix` (leitura crua) e `LocationSample` (consentida) como tipos distintos — o segundo exige `consentVersion` no construtor, então **amostra sem consentimento não é representável**; `LocationQueuePolicy` pura (descarte de amostra parada, fora de ordem ou muito imprecisa; limite de 500 descartando as mais antigas); `LocationCollector` que confere consentimento **a cada coleta** e só remove da fila após confirmação do servidor; `AndroidLocationProvider` sobre o `LocationManager` da plataforma; `LocationService` em foreground com notificação permanente; tela de divulgação versionada antes do diálogo de permissão do sistema.
+
+**Falta para fechar a Fase 5:** mapa e histórico no console web.
+
+**Pendências conhecidas:** sem `ACCESS_BACKGROUND_LOCATION` (coleta só com o serviço em foreground — ampliar exige revisão de política da Play); o intervalo é um laço no serviço e não WorkManager; e o consentimento versionado é exigido por amostra no contrato, mas ainda não há registro no servidor para conferir contra — ver [doc 27](27-consentimento-versionado.md).
 
 ---
 

@@ -19,7 +19,16 @@ class MainActivity : ComponentActivity() {
                     return AgentViewModel(graph.repository, graph.deviceInfo) as T
                 }
             })
-            NexGuardianApp(model)
+            val consentModel: LocationConsentViewModel = viewModel(factory = object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    require(modelClass.isAssignableFrom(LocationConsentViewModel::class.java))
+                    @Suppress("UNCHECKED_CAST")
+                    return LocationConsentViewModel(
+                        graph.consentStore, graph.locationQueue, graph.locationCollector
+                    ) as T
+                }
+            })
+            NexGuardianApp(model, consentModel)
         }
     }
 }

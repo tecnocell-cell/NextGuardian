@@ -2,6 +2,28 @@
 
 Registro por rodada. Mais recente no topo.
 
+## Rodada 18 — Fase 5: coleta consentida de localização no agente (2026-09-16)
+
+Fecha o lado do aparelho da Parte I do [doc 16](16-localizacao-inventario-risco.md). Com a [rodada 17](#rodada-17--fase-5-localização-consentida-e-geofence-backend-2026-09-15) (servidor), a Fase 5 passa a funcionar ponta a ponta; falta só o mapa no console.
+
+**Domínio (puro, testável na JVM):** `LocationFix` (leitura crua da plataforma) e `LocationSample` (posição consentida) são **tipos distintos**. `LocationSample` exige `consentVersion` no construtor, então **uma amostra sem consentimento não é representável** — não é uma checagem que dá para esquecer, é o tipo que não existe. Portas: `ConsentStore`, `LocationQueue`, `LocationProvider`.
+
+**Política da fila** (`LocationQueuePolicy`, pura): descarta amostra que mal se moveu (< 25 m), leitura fora de ordem e fix muito pior que o anterior; limite de 500 amostras, e ao estourar **descarta as mais antigas** — o rastro recente é o que se pede quando se pergunta "onde está".
+
+**Coletor** (`LocationCollector`): consentimento é verificado **a cada coleta**, não uma vez na inicialização — revogar precisa parar agora, não no próximo lançamento do app. Nada é lido da plataforma antes dessa checagem. Amostras só saem da fila **depois** do servidor confirmar; falha transitória mantém o rastro, 4xx definitivo descarta para não repetir para sempre.
+
+**Android:** `AndroidLocationProvider` sobre o `LocationManager` da própria plataforma (sem Play Services: seria uma biblioteca proprietária a mais por um único fix); precisão desconhecida vira 10 km, nunca zero, para que o servidor recuse a travessia em vez de inventá-la. `LocationService` é **foreground com notificação permanente** — monitoramento invisível seria violação de política e traição de quem carrega o aparelho. Permissões: `ACCESS_COARSE/FINE_LOCATION`, `FOREGROUND_SERVICE[_LOCATION]`. **Sem `ACCESS_BACKGROUND_LOCATION`.**
+
+**Consentimento:** tela de divulgação versionada (`LOCATION_CONSENT_VERSION`) que diz o que é coletado, com que frequência, quem vê e como parar — **antes** do diálogo do sistema, não depois. Negar a permissão do SO deixa o consentimento registrado mas nada é coletado, e a tela informa isso.
+
+**Verificado:** **50 testes JVM** (20 novos: tipo, política de fila e coletor), `lintDebug` e `assembleDebug` verdes. Emulador com API 37.1 instalado nesta rodada.
+
+**Limites honestos:**
+- Sem `ACCESS_BACKGROUND_LOCATION`: a coleta acontece enquanto o serviço em foreground roda. Cobrir aparelho com tela apagada por longos períodos exige essa permissão e revisão de política da Play — decisão de produto, não lacuna de código.
+- O intervalo de 15 minutos é um laço com `delay` dentro do serviço, não WorkManager. Continua valendo fechar o agendamento em background (dívida da Fase 2).
+- O consentimento continua **declarado, não conferido** pelo servidor (ver [doc 27](27-consentimento-versionado.md)).
+
+
 ## Rodada 17 — Fase 5: localização consentida e geofence (backend) (2026-09-15)
 
 **Contexto:** ambiente reinstalado após formatação da máquina (git, Node 24, JDK 21, Android Studio + SDK android-37, Python 3.14, binários PostgreSQL 17.10 em `.tools/pgsql`). Repositório íntegro; nada perdido.

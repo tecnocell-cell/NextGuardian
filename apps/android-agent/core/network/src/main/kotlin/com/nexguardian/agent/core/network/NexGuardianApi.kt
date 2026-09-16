@@ -1,6 +1,7 @@
 package com.nexguardian.agent.core.network
 
 import com.nexguardian.agent.domain.DeviceInfo
+import com.nexguardian.agent.domain.LocationSample
 import java.util.UUID
 
 class ApiException(val status: Int, message: String) : Exception(message)
@@ -16,6 +17,8 @@ data class ConfirmResult(
     val trialStartedAt: String,
     val trialExpiresAt: String,
 )
+data class GeofenceCrossing(val geofenceId: String, val name: String, val transition: String)
+data class ReportLocationsResult(val accepted: Int, val transitions: List<GeofenceCrossing>)
 data class HeartbeatResult(
     val serverReceivedAt: String,
     val connectionState: String,
@@ -106,10 +109,31 @@ class NexGuardianApi(
         success(http.postJson("/agent/commands/$commandId/ack", accessToken, null, Json.encode(payload)))
     }
 
+    /**
+     * Sends consented positions in one batch. The server answers with the geofence
+     * transitions it derived, so the agent never decides a crossing on its own.
+     */
+    suspend fun reportLocations(accessToken: String, samples: List<LocationSample>): ReportLocationsResult {
+        require(samples.isNotEmpty()) { "Nothing to report" }
+        val payload = mapOf("samples" to samples.map { it.toMap() })
+        val body = success(http.postJson("/agent/locations", accessToken, null, Json.encode(payload)))
+        val crossings = (body.fields["transitions"] as? JsonArray)?.items.orEmpty().mapNotNull { item ->
+            (item as? JsonObject)?.let {
+                GeofenceCrossing(it.str("geofenceId").orEmpty(), it.str("name").orEmpty(), it.str("transition").orEmpty())
+            }
+        }
+        return ReportLocationsResult(accepted = body.num("accepted")?.toInt() ?: 0, transitions = crossings)
+    }
+
     private fun success(result: HttpResult): JsonObject {
         if (result.status !in 200..299) throw ApiException(result.status, "HTTP ${result.status}")
         return Json.parseObject(result.body)
     }
+
+    private fun LocationSample.toMap(): Map<String, Any?> = mapOf(
+        "latitude" to latitude, "longitude" to longitude, "accuracyMeters" to accuracyMeters,
+        "source" to source.name, "observedAt" to observedAt.toString(), "consentVersion" to consentVersion,
+    )
 
     private fun DeviceInfo.toMap(): Map<String, Any?> = mapOf(
         "name" to name, "manufacturer" to manufacturer, "model" to model,

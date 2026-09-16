@@ -40,8 +40,8 @@ Comece por [`docs/architecture/10-consolidacao-indice.md`](docs/architecture/10-
 
 - ✅ **Backend Core:** **25 paths** do OpenAPI implementados — auth, ativação, enrollment, heartbeat, assinatura/trial, eventos, comandos, políticas e risco explicável, RBAC por papel e localização/geofence. **Isolamento por workspace**, senha/tokens só como hash, trial transacional único e rotação de refresh com detecção de replay. Verificado contra PostgreSQL real: 36 testes unitários e 49 de integração.
 - ✅ **Console web:** Next.js na porta 3001 — visão geral, dispositivos com detalhe (timeline, comandos, risco), vínculo, assinatura e configurações.
-- ✅ **Agente Android:** onboarding, ativação e vínculo; integração com a API real, heartbeat que busca e confirma comandos, tokens cifrados no Keystore.
-- 🚧 **Em construção:** coleta de localização no agente e mapa no console (Fase 5, servidor pronto); heartbeat automático em background; consentimento versionado; alertas.
+- ✅ **Agente Android:** onboarding, ativação e vínculo; integração com a API real, heartbeat que busca e confirma comandos, tokens cifrados no Keystore; **localização consentida** com tela de divulgação versionada, fila offline e serviço em foreground visível.
+- 🚧 **Em construção:** mapa e histórico de localização no console (Fase 5, servidor e agente prontos); heartbeat automático em background; registro de consentimento no servidor; alertas.
 - ⬜ **Não iniciado:** push/FCM, tempo de tela e limites (Family), MDM com Device Owner (Business), ponto eletrônico, console de super-admin e cobrança.
 
 ## Tecnologias

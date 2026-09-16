@@ -21,7 +21,8 @@ private fun SubscriptionState.label() = when(this) {
     SubscriptionState.CANCELLED -> "Cancelada"
 }
 @Composable fun StatusScreen(snapshot: AgentSnapshot, info: DeviceInfo, busy: Boolean, error: String?,
-    settings: () -> Unit, heartbeat: () -> Unit, activate: () -> Unit) {
+    settings: () -> Unit, heartbeat: () -> Unit, activate: () -> Unit,
+    location: (() -> Unit)? = null) {
     Page("Seu aparelho", "Vínculo, assinatura e conexão: estados independentes.", "status_title") {
         InfoCard("Visão geral") {
             Detail("Status do vínculo", snapshot.session.pairingState.label())
@@ -32,6 +33,10 @@ private fun SubscriptionState.label() = when(this) {
                 ConnectionState.OFFLINE -> "Offline"
                 ConnectionState.UNKNOWN -> "Desconhecida"
             })
+        }
+        // Only offered once the device is bound: location has nowhere to go before that.
+        if (location != null && snapshot.session.pairingState == DevicePairingState.PAIRED) {
+            PrimaryButton("Compartilhar localização", "status_location", action = location)
         }
         PrimaryButton("Configurações", "status_settings", action = settings)
         InfoCard("Identificação do aparelho") {

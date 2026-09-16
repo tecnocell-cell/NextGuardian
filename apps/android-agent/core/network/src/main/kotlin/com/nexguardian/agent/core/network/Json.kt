@@ -28,7 +28,7 @@ object Json {
     fun parseObject(text: String): JsonObject =
         parse(text) as? JsonObject ?: throw IllegalArgumentException("Expected a JSON object")
 
-    /** Encodes a request body. Supports String, Boolean, Number, null and Map<String, Any?> (nested). */
+    /** Encodes a request body. Supports String, Boolean, Number, null, List and Map<String, Any?> (nested). */
     fun encode(value: Any?): String = buildString { write(value, this) }
 
     private fun write(value: Any?, out: StringBuilder) {
@@ -39,6 +39,14 @@ object Json {
             is Int -> out.append(value.toString())
             is Long -> out.append(value.toString())
             is Double -> out.append(value.toString())
+            is List<*> -> {
+                out.append('[')
+                for ((index, item) in value.withIndex()) {
+                    if (index > 0) out.append(',')
+                    write(item, out)
+                }
+                out.append(']')
+            }
             is Map<*, *> -> {
                 out.append('{')
                 var first = true
