@@ -86,6 +86,9 @@ model Workspace {
   events Event[]
   commands Command[]
   policy Policy?
+  locationSamples LocationSample[]
+  geofences Geofence[]
+  geofenceStates GeofenceState[]
 }
 
 // Global identity, as defined by doc 21; authentication lives in the auth module.
@@ -189,6 +192,8 @@ model Device {
   sessions DeviceSession[]
   pairings Pairing[]
   commands Command[]
+  locationSamples LocationSample[]
+  geofenceStates GeofenceState[]
 
   @@index([workspaceId])
 }
@@ -233,6 +238,7 @@ enum EventCategory {
   ENROLLMENT
   COMMAND
   SECURITY
+  LOCATION
 }
 
 enum EventSeverity {
@@ -307,7 +313,77 @@ model Policy {
   riskWeightAgentOutdated Int @default(15)
   riskWeightNeverSeen Int @default(10)
   riskWeightRevoked Int @default(50)
+  // Location is sensitive data: retention is short and configurable per tenant (LGPD, doc 16).
+  locationRetentionDays Int @default(30)
+  locationStaleMinutes Int @default(30)
   active Boolean @default(true)
   updatedAt DateTime @updatedAt
   workspace Workspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Restrict)
+}
+
+enum LocationSource {
+  GPS
+  FUSED
+  NETWORK
+}
+
+enum GeofenceTransition {
+  ENTER
+  EXIT
+  DWELL
+}
+
+// A consented position report. observedAt is the device clock (informative);
+// serverReceivedAt is the authority (ADR-0004). Staleness is derived, never stored.
+model LocationSample {
+  locationSampleId String @id @default(uuid()) @db.Uuid
+  workspaceId String @db.Uuid
+  deviceId String @db.Uuid
+  latitude Float
+  longitude Float
+  accuracyMeters Float
+  source LocationSource
+  observedAt DateTime
+  serverReceivedAt DateTime @default(now())
+  consentVersion String
+  device Device @relation(fields: [deviceId], references: [deviceId], onDelete: Restrict)
+  workspace Workspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Restrict)
+
+  @@index([workspaceId, deviceId, serverReceivedAt])
+}
+
+// Circular geofence (doc 16 §3b: circles in the MVP, no polygons/PostGIS).
+model Geofence {
+  geofenceId String @id @default(uuid()) @db.Uuid
+  workspaceId String @db.Uuid
+  name String
+  centerLatitude Float
+  centerLongitude Float
+  radiusMeters Int
+  transitions GeofenceTransition[]
+  dwellMinutes Int @default(10)
+  active Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  workspace Workspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Restrict)
+  states GeofenceState[]
+
+  @@index([workspaceId])
+}
+
+// Last known containment of a device in a geofence; lets the server derive ENTER/EXIT/DWELL.
+model GeofenceState {
+  geofenceId String @db.Uuid
+  deviceId String @db.Uuid
+  workspaceId String @db.Uuid
+  inside Boolean
+  since DateTime
+  dwellNotifiedAt DateTime?
+  updatedAt DateTime @updatedAt
+  geofence Geofence @relation(fields: [geofenceId], references: [geofenceId], onDelete: Cascade)
+  device Device @relation(fields: [deviceId], references: [deviceId], onDelete: Restrict)
+  workspace Workspace @relation(fields: [workspaceId], references: [workspaceId], onDelete: Restrict)
+
+  @@id([geofenceId, deviceId])
+  @@index([workspaceId, deviceId])
 }

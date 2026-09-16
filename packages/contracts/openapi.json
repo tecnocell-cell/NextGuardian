@@ -3034,6 +3034,682 @@
           }
         }
       }
+    },
+    "/agent/locations": {
+      "post": {
+        "operationId": "reportLocations",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Envia posições consentidas (lote; o agente enfileira offline)",
+        "security": [
+          {
+            "deviceBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportLocationsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Aceito",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportLocationsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Pedido inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Proibido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Muitas requisições",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/devices/{deviceId}/locations": {
+      "get": {
+        "operationId": "getDeviceLocations",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Histórico de localização do dispositivo, com frescor derivado",
+        "security": [
+          {
+            "accountBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "deviceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationHistoryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Pedido inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Proibido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Muitas requisições",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/geofences": {
+      "get": {
+        "operationId": "listGeofences",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Lista as geofences do workspace",
+        "security": [
+          {
+            "accountBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeofenceListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Pedido inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Proibido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Muitas requisições",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createGeofence",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Cria uma geofence circular (exige papel ADMIN)",
+        "security": [
+          {
+            "accountBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGeofenceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Criada",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeofenceView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Pedido inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Proibido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Muitas requisições",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/geofences/{geofenceId}": {
+      "put": {
+        "operationId": "updateGeofence",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Atualiza uma geofence (exige papel ADMIN)",
+        "security": [
+          {
+            "accountBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "geofenceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateGeofenceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeofenceView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Pedido inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Proibido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Muitas requisições",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteGeofence",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Remove uma geofence (exige papel ADMIN)",
+        "security": [
+          {
+            "accountBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "geofenceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Removida",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-store",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Pedido inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Proibido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Muitas requisições",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4188,6 +4864,16 @@
               "neverSeen",
               "revoked"
             ]
+          },
+          "locationRetentionDays": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 365
+          },
+          "locationStaleMinutes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1440
           }
         },
         "required": [
@@ -4195,7 +4881,9 @@
           "maxOfflineHours",
           "weights",
           "active",
-          "updatedAt"
+          "updatedAt",
+          "locationRetentionDays",
+          "locationStaleMinutes"
         ]
       },
       "PolicyResponse": {
@@ -4258,6 +4946,16 @@
                 "maximum": 100
               }
             }
+          },
+          "locationRetentionDays": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 365
+          },
+          "locationStaleMinutes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1440
           }
         }
       },
@@ -4393,6 +5091,372 @@
           "nonCompliant",
           "serverTime"
         ]
+      },
+      "LocationSource": {
+        "type": "string",
+        "enum": [
+          "GPS",
+          "FUSED",
+          "NETWORK"
+        ]
+      },
+      "GeofenceTransition": {
+        "type": "string",
+        "enum": [
+          "ENTER",
+          "EXIT",
+          "DWELL"
+        ]
+      },
+      "LocationSampleInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Posição consentida. consentVersion é obrigatório: sem consentimento vigente não há coleta (doc 16).",
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "longitude": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          },
+          "accuracyMeters": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "source": {
+            "$ref": "#/components/schemas/LocationSource"
+          },
+          "observedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Relógio do aparelho; informativo."
+          },
+          "consentVersion": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          }
+        },
+        "required": [
+          "latitude",
+          "longitude",
+          "accuracyMeters",
+          "source",
+          "observedAt",
+          "consentVersion"
+        ]
+      },
+      "ReportLocationsRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "samples": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 200,
+            "items": {
+              "$ref": "#/components/schemas/LocationSampleInput"
+            }
+          }
+        },
+        "required": [
+          "samples"
+        ]
+      },
+      "LocationSampleView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "latitude": {
+            "type": "number"
+          },
+          "longitude": {
+            "type": "number"
+          },
+          "accuracyMeters": {
+            "type": "number"
+          },
+          "source": {
+            "$ref": "#/components/schemas/LocationSource"
+          },
+          "observedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "serverReceivedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Autoridade temporal (ADR-0004)."
+          },
+          "consentVersion": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "latitude",
+          "longitude",
+          "accuracyMeters",
+          "source",
+          "observedAt",
+          "serverReceivedAt",
+          "consentVersion"
+        ]
+      },
+      "GeofenceTransitionEvent": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "geofenceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "transition": {
+            "$ref": "#/components/schemas/GeofenceTransition"
+          }
+        },
+        "required": [
+          "geofenceId",
+          "name",
+          "transition"
+        ]
+      },
+      "ReportLocationsResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "accepted": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "transitions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeofenceTransitionEvent"
+            }
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "accepted",
+          "transitions",
+          "serverTime"
+        ]
+      },
+      "LocationHistoryResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "stale é derivado do limiar do tenant; nunca armazenado (doc 16 §1).",
+        "properties": {
+          "latest": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/LocationSampleView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "stale": {
+            "type": "boolean"
+          },
+          "retentionDays": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "samples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocationSampleView"
+            }
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "latest",
+          "stale",
+          "retentionDays",
+          "samples",
+          "serverTime"
+        ]
+      },
+      "GeofenceView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "centerLatitude": {
+            "type": "number"
+          },
+          "centerLongitude": {
+            "type": "number"
+          },
+          "radiusMeters": {
+            "type": "integer"
+          },
+          "transitions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeofenceTransition"
+            }
+          },
+          "dwellMinutes": {
+            "type": "integer"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "centerLatitude",
+          "centerLongitude",
+          "radiusMeters",
+          "transitions",
+          "dwellMinutes",
+          "active",
+          "updatedAt"
+        ]
+      },
+      "GeofenceListResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "geofences": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeofenceView"
+            }
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "geofences",
+          "serverTime"
+        ]
+      },
+      "CreateGeofenceRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Apenas círculos no MVP (doc 16 §3b): espelha a Geofencing API do Android.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "centerLatitude": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "centerLongitude": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          },
+          "radiusMeters": {
+            "type": "integer",
+            "minimum": 50,
+            "maximum": 50000
+          },
+          "transitions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items": {
+              "$ref": "#/components/schemas/GeofenceTransition"
+            }
+          },
+          "dwellMinutes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1440
+          }
+        },
+        "required": [
+          "name",
+          "centerLatitude",
+          "centerLongitude",
+          "radiusMeters",
+          "transitions"
+        ]
+      },
+      "UpdateGeofenceRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "centerLatitude": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "centerLongitude": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          },
+          "radiusMeters": {
+            "type": "integer",
+            "minimum": 50,
+            "maximum": 50000
+          },
+          "transitions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items": {
+              "$ref": "#/components/schemas/GeofenceTransition"
+            }
+          },
+          "dwellMinutes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1440
+          },
+          "active": {
+            "type": "boolean"
+          }
+        }
       }
     },
     "securitySchemes": {

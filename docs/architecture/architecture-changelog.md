@@ -2,6 +2,39 @@
 
 Registro por rodada. Mais recente no topo.
 
+## Rodada 17 — Fase 5: localização consentida e geofence (backend) (2026-09-15)
+
+**Contexto:** ambiente reinstalado após formatação da máquina (git, Node 24, JDK 21, Android Studio + SDK android-37, Python 3.14, binários PostgreSQL 17.10 em `.tools/pgsql`). Repositório íntegro; nada perdido.
+
+**Backend (`services/api`):** Parte I do [doc 16](16-localizacao-inventario-risco.md), servidor.
+- **Modelo:** `LocationSample` (consentida; `observedAt` = relógio do aparelho, informativo, e `serverReceivedAt` = autoridade, ADR-0004), `Geofence` circular e `GeofenceState` (contenção por device+fence). `EventCategory` ganhou `LOCATION`. Migração `20260915000100_location_geofence`.
+- **Núcleo puro** `geofence.ts`: `distanceMeters` (haversine), `isInside` e `deriveTransition`. Determinístico e testado isoladamente.
+- **Endpoints (4 paths, 6 operações):** `POST /agent/locations` (lote, para o agente esvaziar a fila offline); `GET /devices/{id}/locations` (histórico + `latest` + `stale` derivado); `GET/POST /geofences`; `PUT/DELETE /geofences/{id}`. Contrato em **25 paths**.
+- **Retenção por tenant:** `Policy` ganhou `locationRetentionDays` (30) e `locationStaleMinutes` (30); a poda roda a cada ingestão (LGPD).
+- **RBAC:** gerir geofence exige ADMIN; leitura fica aberta a VIEWER.
+
+**Três decisões que valem registro:**
+- **Precisão não vira travessia:** uma amostra só conta como dentro quando `distância + accuracy <= raio`. Um fix vago (COARSE) não dispara ENTER falso.
+- **Lote offline não replica travessia:** só a amostra mais recente do lote avalia geofence; as intermediárias entram no histórico, mas não reencenam entradas/saídas antigas como se fossem agora.
+- **DWELL sem agendador:** dispara uma vez por permanência, comparando `since` na própria ingestão — o agente já reporta periodicamente.
+
+**Verificado:** typecheck, lint, build; **36 unit** (11 novos de geofence) e **49 de integração** (11 novos de localização, incl. isolamento entre workspaces) contra PostgreSQL 17.10 efêmero; contrato `PASS` (25 paths + 3 casos de localização).
+
+**Limites honestos:**
+- É **só o servidor**. O agente Android ainda não coleta nem envia posição (o manifesto segue com `INTERNET` e `POST_NOTIFICATIONS` apenas) e o console web ainda não tem mapa. Fase 5 **não** está fechada.
+- O **consentimento versionado** é exigido no contrato (`consentVersion` obrigatório por amostra) mas ainda não há registro de consentimento no servidor para conferir contra: a versão enviada é aceita como declarada. Fechar isso é o [doc 27](27-consentimento-versionado.md).
+- **Divergência pré-existente encontrada:** `Idempotency-Key` é declarado `required` em 6 endpoints do contrato e **o servidor nunca lê esse header**. Os endpoints novos não repetem o padrão. A decidir: passar a exigir de fato, ou corrigir o contrato.
+- `prisma.config.ts` passou a aceitar `SHADOW_DATABASE_URL` (opcional) — sem isso o Prisma 7 não gera migração a partir do diretório de migrações.
+
+## Rodada 16 — RBAC nas mutações da conta (2026-09-13)
+
+Registrada em atraso: o trabalho ficou sem commit e sem entrada no changelog quando a máquina foi formatada. Verificada e commitada em 2026-09-15 sem alteração de código.
+
+`RolesGuard` + decorator `MinRole`, com hierarquia explícita VIEWER < OPERATOR < ADMIN < OWNER, aplicado depois do `AccountGuard`. O principal de conta passa a resolver a `Membership` e a carregar o papel; **membership inativa deixa de autenticar**. Papéis mínimos: ADMIN para emitir código de ativação e alterar política, OPERATOR para enfileirar comando; leituras seguem abertas a VIEWER.
+
+**Verificado:** typecheck, lint, build, 25 unit e 38 de integração contra PostgreSQL real (3 novos: divisão leitura/escrita, fronteira operator↔admin, membership revogada perde acesso).
+
+
 ## Rodada 7 — WP-102 persistência base (2026-09-12)
 
 Escopo literal confirmado no WP vigente: Postgres/Prisma, schema Workspace/User/Membership, migration, repositório escopado por workspaceId, integração A≠B. Stack e ADRs ACEITOS obedecidos, sem decisão de produto reaberta.

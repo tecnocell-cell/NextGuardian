@@ -52,7 +52,13 @@ Geofence {
 
 ### 4. Estado atual
 
-**NÃO EXISTE.** Fase 5 do [roadmap](implementation-roadmap.md).
+**SERVIDOR IMPLEMENTADO** (rodada 17); **agente e console pendentes**.
+
+Implementado em `services/api`: `LocationSample` (com `consentVersion`, `observedAt` informativo e `serverReceivedAt` como autoridade), `Geofence` circular e `GeofenceState`; núcleo puro `modules/location/geofence.ts` (`distanceMeters`, `isInside`, `deriveTransition`); endpoints `POST /agent/locations` (lote), `GET /devices/{id}/locations`, `GET/POST /geofences`, `PUT/DELETE /geofences/{id}`; retenção e limiar de frescor configuráveis por tenant na `Policy`; `GEOFENCE_EVENT` na timeline, com payload que nomeia a fence e **nunca** carrega coordenadas.
+
+Regras de §3 honradas no servidor com duas escolhas explícitas: uma amostra só conta como dentro quando `distância + accuracy <= raio` (precisão ruim não fabrica travessia), e um lote acumulado offline avalia geofence **apenas pela amostra mais recente** (não reencena entradas/saídas antigas como se fossem agora).
+
+**Falta para fechar a Fase 5:** coleta no agente Android (permissões, foreground service tipo `location`, fila offline) e o mapa/histórico no console. O consentimento versionado é exigido por amostra no contrato, mas ainda não há registro no servidor para conferir contra — ver [doc 27](27-consentimento-versionado.md).
 
 ---
 

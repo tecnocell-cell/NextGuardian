@@ -20,6 +20,8 @@ export class PolicyRepository {
       riskWeightAgentOutdated?: number;
       riskWeightNeverSeen?: number;
       riskWeightRevoked?: number;
+      locationRetentionDays?: number;
+      locationStaleMinutes?: number;
     },
   ) {
     return this.db.policy.update({ where: { workspaceId }, data });

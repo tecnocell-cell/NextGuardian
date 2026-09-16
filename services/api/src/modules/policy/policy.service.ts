@@ -11,6 +11,8 @@ interface PolicyRecord {
   riskWeightAgentOutdated: number;
   riskWeightNeverSeen: number;
   riskWeightRevoked: number;
+  locationRetentionDays: number;
+  locationStaleMinutes: number;
   active: boolean;
   updatedAt: Date;
 }
@@ -26,6 +28,8 @@ function policyView(policy: PolicyRecord) {
       neverSeen: policy.riskWeightNeverSeen,
       revoked: policy.riskWeightRevoked,
     },
+    locationRetentionDays: policy.locationRetentionDays,
+    locationStaleMinutes: policy.locationStaleMinutes,
     active: policy.active,
     updatedAt: policy.updatedAt.toISOString(),
   };
@@ -45,6 +49,8 @@ export class PolicyService {
     const data: Parameters<PolicyRepository['updatePolicy']>[1] = {};
     if (input.minAppVersion !== undefined) data.minAppVersion = input.minAppVersion;
     if (input.maxOfflineHours !== undefined) data.maxOfflineHours = input.maxOfflineHours;
+    if (input.locationRetentionDays !== undefined) data.locationRetentionDays = input.locationRetentionDays;
+    if (input.locationStaleMinutes !== undefined) data.locationStaleMinutes = input.locationStaleMinutes;
     const w = input.weights;
     if (w) {
       if (w.notPaired !== undefined) data.riskWeightNotPaired = w.notPaired;

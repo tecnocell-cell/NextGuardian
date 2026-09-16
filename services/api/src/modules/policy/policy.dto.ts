@@ -16,10 +16,12 @@ export const updatePolicySchema = z
       })
       .partial()
       .optional(),
+    // Location is sensitive: retention is capped at a year and defaults short (LGPD).
+    locationRetentionDays: z.number().int().min(1).max(365).optional(),
+    locationStaleMinutes: z.number().int().min(1).max(1440).optional(),
   })
-  .refine(
-    data => data.minAppVersion !== undefined || data.maxOfflineHours !== undefined || data.weights !== undefined,
-    { message: 'at least one field is required' },
-  );
+  .refine(data => Object.values(data).some(value => value !== undefined), {
+    message: 'at least one field is required',
+  });
 
 export type UpdatePolicyInput = z.infer<typeof updatePolicySchema>;

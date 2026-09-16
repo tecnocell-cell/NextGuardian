@@ -114,6 +114,58 @@ export function commandView(command: CommandRecord) {
   };
 }
 
+export interface LocationSampleRecord {
+  locationSampleId: string;
+  latitude: number;
+  longitude: number;
+  accuracyMeters: number;
+  source: string;
+  observedAt: Date;
+  serverReceivedAt: Date;
+  consentVersion: string;
+}
+
+// observedAt is the device's own clock and is labelled as such; serverReceivedAt
+// is the authority the console must trust for freshness (ADR-0004).
+export function locationSampleView(sample: LocationSampleRecord) {
+  return {
+    id: sample.locationSampleId,
+    latitude: sample.latitude,
+    longitude: sample.longitude,
+    accuracyMeters: sample.accuracyMeters,
+    source: sample.source,
+    observedAt: sample.observedAt.toISOString(),
+    serverReceivedAt: sample.serverReceivedAt.toISOString(),
+    consentVersion: sample.consentVersion,
+  };
+}
+
+export interface GeofenceRecord {
+  geofenceId: string;
+  name: string;
+  centerLatitude: number;
+  centerLongitude: number;
+  radiusMeters: number;
+  transitions: string[];
+  dwellMinutes: number;
+  active: boolean;
+  updatedAt: Date;
+}
+
+export function geofenceView(geofence: GeofenceRecord) {
+  return {
+    id: geofence.geofenceId,
+    name: geofence.name,
+    centerLatitude: geofence.centerLatitude,
+    centerLongitude: geofence.centerLongitude,
+    radiusMeters: geofence.radiusMeters,
+    transitions: geofence.transitions,
+    dwellMinutes: geofence.dwellMinutes,
+    active: geofence.active,
+    updatedAt: geofence.updatedAt.toISOString(),
+  };
+}
+
 export function deviceSessionView(
   session: { sessionId: string; deviceId: string; accessExpiresAt: Date },
   tokens: { accessToken: string; refreshToken: string },
